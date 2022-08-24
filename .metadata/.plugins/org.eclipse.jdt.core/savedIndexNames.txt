@@ -65,7 +65,6 @@ INDEX VERSION 1.131+C:\Users\t0273500\Desktop\DemosPreparation\BankingApp-CM29_D
 971428490.index
 1317865775.index
 1803525921.index
-2712885400.index
 1846265505.index
 2902521736.index
 3893386055.index
