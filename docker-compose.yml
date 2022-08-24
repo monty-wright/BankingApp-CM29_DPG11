@@ -21,6 +21,16 @@ services:
     volumes:
       - /app/node_modules
       - ./fakebank:/app
+      
+  api:
+    environment:
+      CMIP: https://20.127.6.212
+    container_name: api
+    build:
+      dockerfile: Dockerfile
+      context: ./dpgBankDemo
+    ports:
+      - 8080:8080
 
   ciphertrust:
     image: thalesciphertrust/ciphertrust-data-protection-gateway:latest
