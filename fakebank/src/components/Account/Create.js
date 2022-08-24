@@ -7,7 +7,7 @@ import Col from 'react-bootstrap/Col';
 
 async function createAccount(AccDetails) {
     console.log(AccDetails);
-    return fetch('http://localhost:8080/api/fakebank/account/', {
+    return fetch('http://localhost:8080/api/proxy/account/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

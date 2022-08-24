@@ -30,13 +30,21 @@ services:
       dockerfile: Dockerfile
       context: ./dpgBankDemo
     ports:
+      - 8081:8081
+      
+  proxy:
+    container_name: proxy
+    build:
+      dockerfile: Dockerfile
+      context: ./apiProxy
+    ports:
       - 8080:8080
 
   ciphertrust:
     image: thalesciphertrust/ciphertrust-data-protection-gateway:latest
     container_name: ciphertrust
     environment:
-      - REG_TOKEN=AynX6XkHFREqJ1JWkTduIa91lmQ1AaqnDhUszgRz412lL9p9jtBKcUOODnkenIfH
+      - REG_TOKEN=wIhkyNwg4u4UPltBU1JDHo2LqM25TZmu6TXk9Fg8GZ7PQ9UDWZzuoJJX94B56T59
       - DESTINATION_URL=http://nextjs:3000
       - DPG_PORT=9005
       - TLS_ENABLED=false
