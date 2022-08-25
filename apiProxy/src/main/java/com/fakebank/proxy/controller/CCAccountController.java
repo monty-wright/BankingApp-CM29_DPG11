@@ -57,8 +57,8 @@ public class CCAccountController {
 		newAccount.setUserName(bean.getUserName());
 		
 		
-		String BaseUrl = System.getenv("http://localhost:8081");
-		String URI = BaseUrl + "/api/fakebank/account/";
+		String URI = "http://api:8081/api/fakebank/account/";
+		System.out.println(URI);
 		CreateCustomerResponseBean response = restTemplate.postForObject(URI, newAccount, CreateCustomerResponseBean.class);
 		
 		return response;

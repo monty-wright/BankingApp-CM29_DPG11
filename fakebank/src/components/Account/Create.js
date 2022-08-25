@@ -7,7 +7,7 @@ import Col from 'react-bootstrap/Col';
 
 async function createAccount(AccDetails) {
     console.log(AccDetails);
-    return fetch('http://localhost:8080/api/proxy/account/', {
+    return fetch('http://localhost:9005/api/fakebank/account', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -22,15 +22,42 @@ export default function CreateAccount() {
     const [mobileNumber, setMobileNumber] = useState();
     const [dob, setDob] = useState();
     const [ssn, setSsn] = useState();
-
+    
     const handleSubmit = async event => {
         event.preventDefault();
+        const accountBalance = 0;
+        let todayDate = new Date();
+        let date = todayDate.getDate();
+        let month = todayDate.getMonth();
+        let year = todayDate.getFullYear();
+        let expiryYear = todayDate.getFullYear() + 3;
+        let dateSeparator = '-';
+        const createDt = `${month}${dateSeparator}${date}${dateSeparator}${year}`;
+        const ccExpiry = `${month}${dateSeparator}${date}${dateSeparator}${expiryYear}`;
+
+        const cvvMin = 100;
+        const cvvMax = 999;
+        const ccCvv = cvvMin + Math.random() * (cvvMax - cvvMin);
+
+        const ccNumMin = 1000;
+        const ccNumMax = 9999;
+        let cardFirstSeg = ccNumMin + Math.random() * (ccNumMax - ccNumMin);
+        let cardSecondSeg = ccNumMin + Math.random() * (ccNumMax - ccNumMin);
+        let cardThirdSeg = ccNumMin + Math.random() * (ccNumMax - ccNumMin);
+        let cardFourthSeg = ccNumMin + Math.random() * (ccNumMax - ccNumMin);
+        const ccNumber = `${cardFirstSeg}${dateSeparator}${cardSecondSeg}${dateSeparator}${cardThirdSeg}${dateSeparator}${cardFourthSeg}`;
+
         const Account_details = await createAccount({
             ssn,
+            dob,
             fullName,
-            mobileNumber,
             userName,
-            dob
+            mobileNumber,
+            ccNumber,
+            ccCvv,
+            ccExpiry,
+            accountBalance,
+            createDt
         });
         console.log(Account_details);
       };

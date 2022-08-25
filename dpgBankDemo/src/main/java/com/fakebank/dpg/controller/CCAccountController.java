@@ -30,6 +30,8 @@ public class CCAccountController {
 	@CrossOrigin(origins = "*")
 	@PostMapping("/api/fakebank/account")
 	public CreateCustomerResponseBean saveAccount(@RequestBody CustomerAccountBean bean) {
+		System.out.println(bean.toString());
+		
 		CustomerAccount newAccount = new CustomerAccount();
 		
 		newAccount.setAccountBalance(0);

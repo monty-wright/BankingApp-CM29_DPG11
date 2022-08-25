@@ -2,15 +2,15 @@ version: '3.1'
 
 services:
 
-  nginx:
-    depends_on:
-      - frontend
-    restart: always
-    build:
-      dockerfile: Dockerfile
-      context: ./nginx
-    ports:
-      - "3050:80"
+#  nginx:
+#    depends_on:
+#      - frontend
+#    restart: always
+#    build:
+#      dockerfile: Dockerfile
+#      context: ./nginx
+#    ports:
+#      - "3050:80"
       
   frontend:
     stdin_open: true
@@ -21,6 +21,8 @@ services:
     volumes:
       - /app/node_modules
       - ./fakebank:/app
+    ports:
+      - 3050:3000
       
   api:
     environment:
@@ -30,28 +32,28 @@ services:
       dockerfile: Dockerfile
       context: ./dpgBankDemo
     ports:
-      - 8081:8081
-      
-  proxy:
-    container_name: proxy
-    build:
-      dockerfile: Dockerfile
-      context: ./apiProxy
-    ports:
       - 8080:8080
+      
+#  proxy:
+#    container_name: proxy
+#    build:
+#      dockerfile: Dockerfile
+#      context: ./apiProxy
+#    ports:
+#      - 8080:8080
 
   ciphertrust:
     image: thalesciphertrust/ciphertrust-data-protection-gateway:latest
     container_name: ciphertrust
     environment:
       - REG_TOKEN=wIhkyNwg4u4UPltBU1JDHo2LqM25TZmu6TXk9Fg8GZ7PQ9UDWZzuoJJX94B56T59
-      - DESTINATION_URL=http://nextjs:3000
+      - DESTINATION_URL=http://api:8080
       - DPG_PORT=9005
       - TLS_ENABLED=false
       - KMS=20.127.6.212
     ports:
       - 9005:9005
-
+      
 networks:
   db_net:
     driver: bridge
