@@ -34,13 +34,13 @@ services:
     ports:
       - 8080:8080
       
-#  proxy:
-#    container_name: proxy
-#    build:
-#      dockerfile: Dockerfile
-#      context: ./apiProxy
-#    ports:
-#      - 8080:8080
+  proxy:
+    container_name: proxy
+    build:
+      dockerfile: Dockerfile
+      context: ./apiProxy
+    ports:
+      - 8081:8081
 
   ciphertrust:
     image: thalesciphertrust/ciphertrust-data-protection-gateway:latest

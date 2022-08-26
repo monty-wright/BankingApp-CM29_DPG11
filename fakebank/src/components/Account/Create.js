@@ -7,7 +7,7 @@ import Col from 'react-bootstrap/Col';
 
 async function createAccount(AccDetails) {
     console.log(AccDetails);
-    return fetch('http://localhost:9005/api/fakebank/account', {
+    return fetch('http://localhost:8081/api/proxy/account', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -52,12 +52,12 @@ export default function CreateAccount() {
             dob,
             fullName,
             userName,
-            mobileNumber,
+            mobileNumber/*,
             ccNumber,
             ccCvv,
             ccExpiry,
             accountBalance,
-            createDt
+            createDt*/
         });
         console.log(Account_details);
       };
