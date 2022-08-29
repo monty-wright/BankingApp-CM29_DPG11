@@ -3,13 +3,13 @@
     position: fixed;
     width: 36px;
     height: 30px;
-    left: 36px;
-    top: 36px;
+    left: 15px;
+    top: 15px;
   }
   
   /* Color/shape of burger icon bars */
   .bm-burger-bars {
-    background: #373a47;
+    background: #c8104b;
   }
   
   /* Color/shape of burger icon bars on hover*/
@@ -39,14 +39,14 @@
   
   /* General sidebar styles */
   .bm-menu {
-    background: #373a47;
-    padding: 2.5em 1.5em 0;
+    background: #a90000;
+    padding: .5em .5em 0;
     font-size: 1.15em;
   }
   
   /* Morph shape necessary with bubble or elastic */
   .bm-morph-shape {
-    fill: #373a47;
+    fill: #a90000;
   }
   
   /* Wrapper for item list */
@@ -57,9 +57,10 @@
   
   /* Individual item */
   .bm-item {
+    margin-top: 1em;
     display: inline-block;
-
-    color: #d1d1d1;
+    /*border-bottom: #ffffff 1px solid;*/
+    color: #fff;
     margin-bottom: 10px;
     text-align: left;
     text-decoration: none;

@@ -1,29 +1,44 @@
 import React from 'react';
-import { bubble as Menu } from 'react-burger-menu';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCocktail, faDesktop, faHistory, faHome } from '@fortawesome/free-solid-svg-icons';
-import './Sidebar.css';
-import { Link } from 'react-router-dom';
+import { faShield, faRectangleXmark, faHistory, faUser, faBook } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import Container from 'react-bootstrap/Container';
+import Nav from 'react-bootstrap/Nav';
+import Navbar from 'react-bootstrap/Navbar';
+import NavDropdown from 'react-bootstrap/NavDropdown';
 
-export default props => {
+const Sidebar = () =>  {
   return (
-    <Menu>
-      <Link className="menu-item" to="/">
-        <FontAwesomeIcon icon={faHome} /> Home
-      </Link>
-      <hr />
-      <Link className="menu-item" to="/createAccount">
-        <FontAwesomeIcon icon={faCocktail} /> Create New Account
-      </Link>
-      <hr />
-      <Link className="menu-item" to="/accountDetails">
-        <FontAwesomeIcon icon={faDesktop} /> Account Details
-      </Link>
-      <hr />
-      <Link className="menu-item" to="/statements">
-        <FontAwesomeIcon icon={faHistory} /> Statements
-      </Link>
-      <hr />
-    </Menu>
+    <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
+      <Container>
+        <Navbar.Brand href="/">FakeBank</Navbar.Brand>
+        <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+        <Navbar.Collapse id="responsive-navbar-nav">
+          <Nav className="me-auto">
+            <Nav.Link href="/statements"><FontAwesomeIcon icon={faHistory} /> Transactions</Nav.Link>
+            <NavDropdown title="Account" id="collasible-nav-dropdown">
+              <NavDropdown.Item href="/accountDetails">
+                <FontAwesomeIcon icon={faBook} /> View Accounts
+              </NavDropdown.Item>
+              <NavDropdown.Item href="/createAccount">
+                <FontAwesomeIcon icon={faShield} /> Create New Account
+              </NavDropdown.Item>
+              <NavDropdown.Divider />
+              <NavDropdown.Item href="/">
+                <FontAwesomeIcon icon={faRectangleXmark} /> Close Account
+              </NavDropdown.Item>
+            </NavDropdown>
+          </Nav>
+          <Nav>            
+            <NavDropdown title="Profile" id="collasible-nav-dropdown">
+              <NavDropdown.Item href="/">
+                <FontAwesomeIcon icon={faUser} /> Logout
+              </NavDropdown.Item>              
+            </NavDropdown>
+          </Nav>
+        </Navbar.Collapse>
+      </Container>
+    </Navbar>
   );
 };
+
+export default Sidebar;

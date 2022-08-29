@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import Card from 'react-bootstrap/Card';
 
 async function createAccount(AccDetails) {
     console.log(AccDetails);
@@ -25,46 +25,20 @@ export default function CreateAccount() {
     
     const handleSubmit = async event => {
         event.preventDefault();
-        const accountBalance = 0;
-        let todayDate = new Date();
-        let date = todayDate.getDate();
-        let month = todayDate.getMonth();
-        let year = todayDate.getFullYear();
-        let expiryYear = todayDate.getFullYear() + 3;
-        let dateSeparator = '-';
-        const createDt = `${month}${dateSeparator}${date}${dateSeparator}${year}`;
-        const ccExpiry = `${month}${dateSeparator}${date}${dateSeparator}${expiryYear}`;
-
-        const cvvMin = 100;
-        const cvvMax = 999;
-        const ccCvv = cvvMin + Math.random() * (cvvMax - cvvMin);
-
-        const ccNumMin = 1000;
-        const ccNumMax = 9999;
-        let cardFirstSeg = ccNumMin + Math.random() * (ccNumMax - ccNumMin);
-        let cardSecondSeg = ccNumMin + Math.random() * (ccNumMax - ccNumMin);
-        let cardThirdSeg = ccNumMin + Math.random() * (ccNumMax - ccNumMin);
-        let cardFourthSeg = ccNumMin + Math.random() * (ccNumMax - ccNumMin);
-        const ccNumber = `${cardFirstSeg}${dateSeparator}${cardSecondSeg}${dateSeparator}${cardThirdSeg}${dateSeparator}${cardFourthSeg}`;
-
         const Account_details = await createAccount({
             ssn,
             dob,
             fullName,
             userName,
-            mobileNumber/*,
-            ccNumber,
-            ccCvv,
-            ccExpiry,
-            accountBalance,
-            createDt*/
+            mobileNumber
         });
         console.log(Account_details);
       };
     return(
         <div>
-            <h2>Add New Credit Card Account</h2>
-            <Container>
+            <Card>
+            <Card.Header>Register New Credit Card</Card.Header>
+            <Card.Body>
                 <Form onSubmit={handleSubmit}>
                     <Row>
                         <Col xs={6}>
@@ -119,7 +93,8 @@ export default function CreateAccount() {
                         </Col>
                     </Row>
                 </Form>
-            </Container>
+            </Card.Body>
+            </Card>
         </div>
     );
 }
