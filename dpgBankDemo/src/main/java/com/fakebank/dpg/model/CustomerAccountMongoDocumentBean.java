@@ -3,8 +3,7 @@
  */
 package com.fakebank.dpg.model;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -19,8 +18,8 @@ public class CustomerAccountMongoDocumentBean {
 	@Id
 	private String userName;
 	private String creationDate;
-	private Map<String, String> personalDetails = new HashMap<>();
-	private Map<String,Map<String, String>> accounts = new HashMap<String, Map<String, String>>();
+	private List<CustomerAccountCard> cards;
+	private CustomerAccountPersonal details;
 
 	public String getUserName() {
 		return userName;
@@ -38,19 +37,19 @@ public class CustomerAccountMongoDocumentBean {
 		this.creationDate = creationDate;
 	}
 
-	public Map<String, String> getPersonalDetails() {
-		return personalDetails;
+	public List<CustomerAccountCard> getCards() {
+		return cards;
 	}
 
-	public void setPersonalDetails(Map<String, String> personalDetails) {
-		this.personalDetails = personalDetails;
+	public void setCards(List<CustomerAccountCard> cards) {
+		this.cards = cards;
 	}
 
-	public Map<String, Map<String, String>> getAccounts() {
-		return accounts;
+	public CustomerAccountPersonal getDetails() {
+		return details;
 	}
 
-	public void setAccounts(Map<String, Map<String, String>> accounts) {
-		this.accounts = accounts;
+	public void setDetails(CustomerAccountPersonal details) {
+		this.details = details;
 	}
 }

@@ -18,7 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fakebank.dpg.bean.CustomerAccountBean;
 import com.fakebank.dpg.bean.CustomerCreditAccounts;
 import com.fakebank.dpg.bean.CustomerPersonalDetails;
+import com.fakebank.dpg.model.CustomerAccountCard;
 import com.fakebank.dpg.model.CustomerAccountMongoDocumentBean;
+import com.fakebank.dpg.model.CustomerAccountPersonal;
 import com.fakebank.dpg.repository.CustomerAccountMongoRepository;
 
 
@@ -40,47 +42,40 @@ public class CCAccountController {
 		Optional<CustomerAccountMongoDocumentBean> existingUser = mongoCustomerAccountRepo.findById(bean.getUserName());
 		if(existingUser.isPresent()) {
 			CustomerAccountMongoDocumentBean user = existingUser.get();
-			Map<String, String> personal = new HashMap<>();
-			personal.put("name", bean.getFullName());
-			personal.put("dob", bean.getDob());
-			personal.put("mobile", bean.getMobileNumber());
-			personal.put("ssn", bean.getSsn());
-			personal.put("thalesId", bean.getIntCmId());
-			user.setPersonalDetails(personal);
+			CustomerAccountPersonal userPersonalDetails = new CustomerAccountPersonal();
+			userPersonalDetails.setDob(bean.getDob());
+			userPersonalDetails.setMobile(bean.getMobileNumber());
+			userPersonalDetails.setName(bean.getFullName());
+			userPersonalDetails.setSsn(bean.getSsn());
+			userPersonalDetails.setThalesId(bean.getIntCmId());
+			user.setDetails(userPersonalDetails);
 			
-			Map<String, String> account = new HashMap<>();
-			account.put("CCNumber", bean.getCcNumber());
-			account.put("cvv", bean.getCcCvv());
-			account.put("CCExpiryDate", bean.getCcExpiry());
-			account.put("accountBalance", "0");
-			Map<String,Map<String, String>> accounts = user.getAccounts();
-			accounts.put(bean.getAccFriendlyName(), account);
+			CustomerAccountCard newCardDetails = new CustomerAccountCard();
+			newCardDetails.setCcNumber(bean.getCcNumber());
+			newCardDetails.setCvv(bean.getCcCvv());
+			newCardDetails.setFriendlyName(bean.getAccFriendlyName());
+			newCardDetails.setExpDate(bean.getCcExpiry());
+			newCardDetails.setBalance("0");
 			
 			mongoCustomerAccountRepo.save(user);
 		}
 		else {
 			CustomerAccountMongoDocumentBean accountBody = new CustomerAccountMongoDocumentBean();
-			Map<String, String> personal = new HashMap<>();
-			Map<String, String> account = new HashMap<>();
-			
 			accountBody.setUserName(bean.getUserName());
+			CustomerAccountPersonal userPersonalDetails = new CustomerAccountPersonal();
+			userPersonalDetails.setDob(bean.getDob());
+			userPersonalDetails.setMobile(bean.getMobileNumber());
+			userPersonalDetails.setName(bean.getFullName());
+			userPersonalDetails.setSsn(bean.getSsn());
+			userPersonalDetails.setThalesId(bean.getIntCmId());
 			
-			personal.put("name", bean.getFullName());
-			personal.put("dob", bean.getDob());
-			personal.put("mobile", bean.getMobileNumber());
-			personal.put("ssn", bean.getSsn());
-			personal.put("thalesId", bean.getIntCmId());
+			CustomerAccountCard newCardDetails = new CustomerAccountCard();
+			newCardDetails.setCcNumber(bean.getCcNumber());
+			newCardDetails.setCvv(bean.getCcCvv());
+			newCardDetails.setFriendlyName(bean.getAccFriendlyName());
+			newCardDetails.setExpDate(bean.getCcExpiry());
+			newCardDetails.setBalance("0");
 			
-			account.put("CCNumber", bean.getCcNumber());
-			account.put("cvv", bean.getCcCvv());
-			account.put("CCExpiryDate", bean.getCcExpiry());
-			account.put("accountBalance", "0");
-			
-			Map<String,Map<String, String>> accounts = new HashMap<String,Map<String, String>>();
-			accounts.put(bean.getAccFriendlyName(), account);
-			
-			accountBody.setAccounts(accounts);
-			accountBody.setPersonalDetails(personal);
 			accountBody.setCreationDate(bean.getCreateDt());
 			
 			CustomerAccountMongoDocumentBean res = mongoCustomerAccountRepo.save(accountBody);
@@ -104,6 +99,7 @@ public class CCAccountController {
 		return "new credit account added succesfully";
 	}
 	
+	@CrossOrigin(origins = "*")
 	@GetMapping("/api/fakebank/accounts/{id}")
 	public CustomerCreditAccounts getAccountsById(@PathVariable("id") String id) {
 		Optional<CustomerAccountMongoDocumentBean> acc = mongoCustomerAccountRepo.findById(id);
@@ -113,6 +109,7 @@ public class CCAccountController {
 		return res;
 	}
 	
+	@CrossOrigin(origins = "*")
 	@GetMapping("/api/fakebank/details/{id}")
 	public CustomerPersonalDetails getAccountDetailsById(@PathVariable("id") String id) {
 		Optional<CustomerAccountMongoDocumentBean> acc = mongoCustomerAccountRepo.findById(id);

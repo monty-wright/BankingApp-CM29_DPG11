@@ -8,7 +8,6 @@ import useToken from '../../useToken';
 import jwt_decode from "jwt-decode";
 
 async function createAccount(AccDetails) {
-    console.log(AccDetails);
     return fetch('http://localhost:8081/api/proxy/account', {
       method: 'POST',
       headers: {
@@ -21,8 +20,7 @@ async function createAccount(AccDetails) {
 export default function CreateAccount() {
     const { token } = useToken();
     var decodedToken = jwt_decode(token);
-    console.log(decodedToken);
-
+    
     const [fullName, setFullName] = useState();
     const [mobileNumber, setMobileNumber] = useState();
     const [dob, setDob] = useState();
@@ -30,7 +28,6 @@ export default function CreateAccount() {
     const [accFriendlyName, setAccFriendlyName] = useState();
     const cmID = decodedToken.sub;
     const userName = decodedToken.preferred_username;
-    console.log(cmID);
     const handleSubmit = async event => {
         event.preventDefault();
         const Account_details = await createAccount({

@@ -1,33 +1,32 @@
-import React from 'react';
+import {React, useEffect, useState} from 'react';
+import useToken from '../../useToken';
 import jwt_decode from "jwt-decode";
-import { Navigate } from "react-router-dom";
+import axios from 'axios';
+import { Accordion } from 'react-bootstrap';
 
-class Account extends React.Component{
-  state = {
-    expiredToken: ""
-  };
-  componentDidMount(){
-    let token = sessionStorage.getItem("token");
-    var parsedToken = JSON.parse(token);
-    var decodedToken = jwt_decode(parsedToken.token);
+function Account() {
+  const [accounts, setAccounts] = useState();
+  const { token } = useToken();
+  var decodedToken = jwt_decode(token);
+
+  useEffect(() => {
+    getAllAccounts();
+  }, []);
+  
+  const getAllAccounts = () => {
+    axios
+      .get('http://localhost:8080/api/fakebank/accounts/' + decodedToken.preferred_username)
+      .then((res) => {
+        setAccounts(res.data.accounts);
+      })
+      .catch((err) => console.log(err));
+  };  
+
+  console.log(accounts[0]);
+  return(
     
-    var dateNow = new Date();
-    if(decodedToken.exp * 1000 < dateNow.getTime()) {
-      console.log("token expired");
-      //sessionStorage.removeItem("token");
-      this.setState({'expiredToken': true})
-    } else {
-      console.log("token valid");
-    }
-  }
-  render(){
-    if (this.state.expiredToken){
-      return <Navigate to="/" />
-    }
-    return (
-      <h2>Account Details</h2>
-    )
-  }
+    <div></div>
+  )
 }
 
 export default Account;
