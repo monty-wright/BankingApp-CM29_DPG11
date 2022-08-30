@@ -18,6 +18,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 @DynamoDBTable(tableName = "customer")
 public class CustomerAccount {
 	private String customerId;
+	private String customerCmId;
 	private String ssn;
 	private String dob;
 	private String fullName;
@@ -129,19 +130,21 @@ public class CustomerAccount {
 		this.createDt = createDt;
 	}
 
-	@Override
-	public String toString() {
-		return "CustomerAccount [customerId=" + customerId + ", ssn=" + ssn + ", dob=" + dob + ", fullName=" + fullName
-				+ ", userName=" + userName + ", mobileNumber=" + mobileNumber + ", ccNumber=" + ccNumber + ", ccCvv="
-				+ ccCvv + ", ccExpiry=" + ccExpiry + ", accountBalance=" + accountBalance + ", createDt=" + createDt
-				+ "]";
+	@DynamoDBAttribute
+	public String getCustomerCmId() {
+		return customerCmId;
 	}
 
-	public CustomerAccount(String customerId, String ssn, String dob, String fullName, String userName,
-			String mobileNumber, String ccNumber, String ccCvv, String ccExpiry, long accountBalance,
+	public void setCustomerCmId(String customerCmId) {
+		this.customerCmId = customerCmId;
+	}
+
+	public CustomerAccount(String customerId, String customerCmId, String ssn, String dob, String fullName,
+			String userName, String mobileNumber, String ccNumber, String ccCvv, String ccExpiry, long accountBalance,
 			String createDt) {
 		super();
 		this.customerId = customerId;
+		this.customerCmId = customerCmId;
 		this.ssn = ssn;
 		this.dob = dob;
 		this.fullName = fullName;
@@ -157,6 +160,14 @@ public class CustomerAccount {
 	public CustomerAccount() {
 		super();
 		// TODO Auto-generated constructor stub
+	}
+
+	@Override
+	public String toString() {
+		return "CustomerAccount [customerId=" + customerId + ", customerCmId=" + customerCmId + ", ssn=" + ssn
+				+ ", dob=" + dob + ", fullName=" + fullName + ", userName=" + userName + ", mobileNumber="
+				+ mobileNumber + ", ccNumber=" + ccNumber + ", ccCvv=" + ccCvv + ", ccExpiry=" + ccExpiry
+				+ ", accountBalance=" + accountBalance + ", createDt=" + createDt + "]";
 	}
 
 }

@@ -4,6 +4,8 @@ import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Card from 'react-bootstrap/Card';
+import useToken from '../../useToken';
+import jwt_decode from "jwt-decode";
 
 async function createAccount(AccDetails) {
     console.log(AccDetails);
@@ -17,12 +19,18 @@ async function createAccount(AccDetails) {
 }
 
 export default function CreateAccount() {
-    const [userName, setUserName] = useState();
+    const { token } = useToken();
+    var decodedToken = jwt_decode(token);
+    console.log(decodedToken);
+
     const [fullName, setFullName] = useState();
     const [mobileNumber, setMobileNumber] = useState();
     const [dob, setDob] = useState();
     const [ssn, setSsn] = useState();
-    
+    const [accFriendlyName, setAccFriendlyName] = useState();
+    const cmID = decodedToken.sub;
+    const userName = decodedToken.preferred_username;
+    console.log(cmID);
     const handleSubmit = async event => {
         event.preventDefault();
         const Account_details = await createAccount({
@@ -30,7 +38,9 @@ export default function CreateAccount() {
             dob,
             fullName,
             userName,
-            mobileNumber
+            mobileNumber,
+            cmID,
+            accFriendlyName
         });
         console.log(Account_details);
       };
@@ -44,10 +54,8 @@ export default function CreateAccount() {
                         <Col xs={6}>
                             <Form.Group className="mb-3" controlId="formBasicUsername">
                                 <Form.Label>Username</Form.Label>
-                                <Form.Control type="text" placeholder="Enter CipherTrust Manager Username" onChange={e => setUserName(e.target.value)} />
-                                <Form.Text className="text-muted">
-                                    We'll never share your email with anyone else.
-                                </Form.Text>
+                                <Form.Control type="text" value={decodedToken.preferred_username}
+                                disabled={true} />
                             </Form.Group>
                         </Col>
                         <Col xs={6}>
@@ -82,7 +90,12 @@ export default function CreateAccount() {
                                 <Form.Control type="date" placeholder="DateOfBirth" onChange={e => setDob(e.target.value)} />
                             </Form.Group>
                         </Col>
-                        <Col xs={6}></Col>
+                        <Col xs={6}>
+                            <Form.Group className="mb-3" controlId="formBasicFriendlyNameAcc">
+                                <Form.Label>Account Friendly Name</Form.Label>
+                                <Form.Control type="text" placeholder="AccFriendlyName" onChange={e => setAccFriendlyName(e.target.value)} />
+                            </Form.Group>
+                        </Col>
                     </Row>
 
                     <Row>

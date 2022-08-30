@@ -9,9 +9,13 @@ import java.util.Calendar;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
@@ -31,8 +35,9 @@ public class CCAccountController {
 	private RestTemplate restTemplate;
 	
 	@CrossOrigin(origins = "*")
-	@PostMapping("/api/proxy/account")
-	public CreateCustomerResponseBean saveAccount(@RequestBody AccountCreateRequestBean bean) {
+	@PostMapping(value = "/api/proxy/account", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public String saveAccount(@RequestBody AccountCreateRequestBean bean) {
 		CustomerAccountBean newAccount = new CustomerAccountBean();
 		int cvv = ThreadLocalRandom.current().nextInt(100, 999);
 		String ccNumber = String.valueOf(ThreadLocalRandom.current().nextInt(1000, 9999)) + "-"
@@ -55,12 +60,13 @@ public class CCAccountController {
 		newAccount.setSsn(bean.getSsn());
 		newAccount.setMobileNumber(bean.getMobileNumber());
 		newAccount.setUserName(bean.getUserName());
+		newAccount.setIntCmId(bean.getCmID());
+		newAccount.setAccFriendlyName(bean.getAccFriendlyName());
 		
+		String dockerUri = "http://ciphertrust:9005/api/fakebank/account";
+		String devUri = "http://localhost:8080/api/fakebank/account";
+		String createResponse = restTemplate.postForObject(devUri, newAccount, String.class);
 		
-		String URI = "http://ciphertrust:9005/api/fakebank/account";
-		System.out.println(URI);
-		CreateCustomerResponseBean response = restTemplate.postForObject(URI, newAccount, CreateCustomerResponseBean.class);
-		
-		return response;
+		return createResponse;
 	}
 }

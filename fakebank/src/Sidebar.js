@@ -5,8 +5,12 @@ import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
+import useToken from './useToken';
+import jwt_decode from "jwt-decode";
 
 const Sidebar = () =>  {
+  const { token } = useToken();
+  var decodedToken = jwt_decode(token);
   return (
     <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
       <Container>
@@ -29,7 +33,7 @@ const Sidebar = () =>  {
             </NavDropdown>
           </Nav>
           <Nav>            
-            <NavDropdown title="Profile" id="collasible-nav-dropdown">
+            <NavDropdown title={decodedToken.preferred_username} id="collasible-nav-dropdown">
               <NavDropdown.Item href="/">
                 <FontAwesomeIcon icon={faUser} /> Logout
               </NavDropdown.Item>              

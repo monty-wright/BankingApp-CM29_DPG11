@@ -19,6 +19,8 @@ public class CustomerAccountBean {
 	private String ccExpiry;
 	private long accountBalance;
 	private String createDt;
+	private String intCmId;
+	private String accFriendlyName;
 
 	public String getSsn() {
 		return ssn;
@@ -100,17 +102,24 @@ public class CustomerAccountBean {
 		this.createDt = createDt;
 	}
 
-	@Override
-	public String toString() {
-		return "CustomerAccount [ssn=" + ssn + ", dob=" + dob + ", fullName=" + fullName
-				+ ", userName=" + userName + ", mobileNumber=" + mobileNumber + ", ccNumber=" + ccNumber + ", ccCvv="
-				+ ccCvv + ", ccExpiry=" + ccExpiry + ", accountBalance=" + accountBalance + ", createDt=" + createDt
-				+ "]";
+	public String getIntCmId() {
+		return intCmId;
 	}
 
-	public CustomerAccountBean(String ssn, String dob, String fullName, String userName,
-			String mobileNumber, String ccNumber, String ccCvv, String ccExpiry, long accountBalance,
-			String createDt) {
+	public void setIntCmId(String intCmId) {
+		this.intCmId = intCmId;
+	}
+
+	public String getAccFriendlyName() {
+		return accFriendlyName;
+	}
+
+	public void setAccFriendlyName(String accFriendlyName) {
+		this.accFriendlyName = accFriendlyName;
+	}
+
+	public CustomerAccountBean(String ssn, String dob, String fullName, String userName, String mobileNumber,
+			String ccNumber, String ccCvv, String ccExpiry, long accountBalance, String createDt, String intCmId) {
 		super();
 		this.ssn = ssn;
 		this.dob = dob;
@@ -122,6 +131,15 @@ public class CustomerAccountBean {
 		this.ccExpiry = ccExpiry;
 		this.accountBalance = accountBalance;
 		this.createDt = createDt;
+		this.intCmId = intCmId;
+	}
+
+	@Override
+	public String toString() {
+		return "CustomerAccountBean [ssn=" + ssn + ", dob=" + dob + ", fullName=" + fullName + ", userName=" + userName
+				+ ", mobileNumber=" + mobileNumber + ", ccNumber=" + ccNumber + ", ccCvv=" + ccCvv + ", ccExpiry="
+				+ ccExpiry + ", accountBalance=" + accountBalance + ", createDt=" + createDt + ", intCmId=" + intCmId
+				+ "]";
 	}
 
 	public CustomerAccountBean() {
