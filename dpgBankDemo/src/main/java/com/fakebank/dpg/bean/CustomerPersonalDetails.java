@@ -1,10 +1,10 @@
 package com.fakebank.dpg.bean;
 
-import java.util.Map;
+import com.fakebank.dpg.model.CustomerAccountPersonal;
 
 public class CustomerPersonalDetails {
 	private String userName;
-	private Map<String, String> details;
+	private CustomerAccountPersonal details;
 
 	public String getUserName() {
 		return userName;
@@ -14,11 +14,11 @@ public class CustomerPersonalDetails {
 		this.userName = userName;
 	}
 
-	public Map<String, String> getDetails() {
+	public CustomerAccountPersonal getDetails() {
 		return details;
 	}
 
-	public void setDetails(Map<String, String> details) {
+	public void setDetails(CustomerAccountPersonal details) {
 		this.details = details;
 	}
 }

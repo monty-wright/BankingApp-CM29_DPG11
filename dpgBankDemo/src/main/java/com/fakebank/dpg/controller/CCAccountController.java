@@ -3,8 +3,8 @@
  */
 package com.fakebank.dpg.controller;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +56,9 @@ public class CCAccountController {
 			newCardDetails.setFriendlyName(bean.getAccFriendlyName());
 			newCardDetails.setExpDate(bean.getCcExpiry());
 			newCardDetails.setBalance("0");
+			List<CustomerAccountCard> cards = user.getCards();
+			cards.add(newCardDetails);
+			user.setCards(cards);
 			
 			mongoCustomerAccountRepo.save(user);
 		}
@@ -68,6 +71,7 @@ public class CCAccountController {
 			userPersonalDetails.setName(bean.getFullName());
 			userPersonalDetails.setSsn(bean.getSsn());
 			userPersonalDetails.setThalesId(bean.getIntCmId());
+			accountBody.setDetails(userPersonalDetails);
 			
 			CustomerAccountCard newCardDetails = new CustomerAccountCard();
 			newCardDetails.setCcNumber(bean.getCcNumber());
@@ -75,10 +79,13 @@ public class CCAccountController {
 			newCardDetails.setFriendlyName(bean.getAccFriendlyName());
 			newCardDetails.setExpDate(bean.getCcExpiry());
 			newCardDetails.setBalance("0");
+			List<CustomerAccountCard> cards = new ArrayList<CustomerAccountCard>();
+			cards.add(newCardDetails);
+			accountBody.setCards(cards);
 			
 			accountBody.setCreationDate(bean.getCreateDt());
 			
-			CustomerAccountMongoDocumentBean res = mongoCustomerAccountRepo.save(accountBody);
+			mongoCustomerAccountRepo.save(accountBody);
 		}
 		
 		
@@ -105,7 +112,7 @@ public class CCAccountController {
 		Optional<CustomerAccountMongoDocumentBean> acc = mongoCustomerAccountRepo.findById(id);
 		CustomerCreditAccounts res = new CustomerCreditAccounts();
 		res.setUserName(acc.get().getUserName());
-		res.setAccounts(acc.get().getAccounts());
+		res.setAccounts(acc.get().getCards());
 		return res;
 	}
 	
@@ -115,7 +122,7 @@ public class CCAccountController {
 		Optional<CustomerAccountMongoDocumentBean> acc = mongoCustomerAccountRepo.findById(id);
 		CustomerPersonalDetails res = new CustomerPersonalDetails();
 		res.setUserName(acc.get().getUserName());
-		res.setDetails(acc.get().getPersonalDetails());
+		res.setDetails(acc.get().getDetails());
 		return res;
 	}
 	

@@ -9,6 +9,7 @@ import Statement from './components/Statement/Statement';
 import Account from './components/Account/Account';
 import CreateAccount from './components/Account/Create';
 import jwt_decode from "jwt-decode";
+import Fetch from './components/Account/Fetch';
 
 function App() {
 
@@ -35,6 +36,7 @@ function App() {
             <Route path="/statements" element={<Statement />} />
             <Route path="/accountDetails" element={<Account />} />
             <Route path="/createAccount" element={<CreateAccount />} />
+            <Route path="/fetch" element={<Fetch />} />
           </Routes>
         </BrowserRouter>
       </div>

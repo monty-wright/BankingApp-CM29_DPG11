@@ -3,7 +3,9 @@
  */
 package com.fakebank.dpg.bean;
 
-import java.util.Map;
+import java.util.List;
+
+import com.fakebank.dpg.model.CustomerAccountCard;
 
 /**
  * @author CipherTrust.io
@@ -11,7 +13,7 @@ import java.util.Map;
  */
 public class CustomerCreditAccounts {
 	private String userName;
-	private Map<String, Map<String, String>> accounts;
+	private List<CustomerAccountCard> accounts;
 
 	public String getUserName() {
 		return userName;
@@ -21,11 +23,11 @@ public class CustomerCreditAccounts {
 		this.userName = userName;
 	}
 
-	public Map<String, Map<String, String>> getAccounts() {
+	public List<CustomerAccountCard> getAccounts() {
 		return accounts;
 	}
 
-	public void setAccounts(Map<String, Map<String, String>> accounts) {
+	public void setAccounts(List<CustomerAccountCard> accounts) {
 		this.accounts = accounts;
 	}
 }
