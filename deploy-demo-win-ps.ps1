@@ -1,7 +1,7 @@
 $username = "admin"
 $password = "Entrust@2018"
 $kms = "20.127.6.212"
-$counter = "dpg-aj-6"
+$counter = "dpg-aj-8"
 
 #Some house keeping stuff
 add-type @"
@@ -286,5 +286,5 @@ $body = @{
 }
 $jsonBody = $body | ConvertTo-Json -Depth 5
 $response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
-$appId = $response.id
-$appId.reg_token
+$regToken = $response.reg_token
+Write-Output "REG_TOKEN=$regToken"
