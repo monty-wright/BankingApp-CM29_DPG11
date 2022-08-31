@@ -1,7 +1,7 @@
 $username = "admin"
 $password = "Entrust@2018"
 $kms = "20.127.6.212"
-$counter = "dpg-aj-2"
+$counter = "dpg-aj-6"
 
 #Some house keeping stuff
 add-type @"
@@ -173,3 +173,118 @@ $body = @{
 $jsonBody = $body | ConvertTo-Json -Depth 5
 $response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
 $accessPolicyId = $response.id
+
+#This is the interesting step...defining DPG policies for the API endpoints
+Write-Output "Creating DPG Policy for CC use case..."
+$url = "https://$kms/api/v1/data-protection/dpg-policies"
+$body = @{
+    'name' = "cc_policy-$counter"
+    'description' = 'DPG policy for credit card attributes'
+    'proxy_config' = @(
+        @{
+            'api_url' = '/api/fakebank/account'
+            'json_request_post_tokens' = @(
+                @{
+                    'name' = 'ccNumber'
+                    'operation' = 'protect'
+                    'protection_policy' = "CC_ProtectionPolicy-$counter"
+                },
+                @{
+                    'name' = 'cvv'
+                    'operation' = 'protect'
+                    'protection_policy' = "cvv_ProtectionPolicy-$counter"
+                },
+                @{
+                    'name' = 'ssn'
+                    'operation' = 'protect'
+                    'protection_policy' = "SSN_ProtectionPolicy-$counter"
+                }
+            )
+            'json_response_get_tokens' = @(
+                @{
+                    'name' = 'cvv'
+                    'operation' = 'reveal'
+                    'protection_policy' = "cvv_ProtectionPolicy-$counter"
+                    'access_policy' = "cc_access_policy-$counter"
+                },@{
+                    'name' = 'ccNumber'
+                    'operation' = 'reveal'
+                    'protection_policy' = "cvv_ProtectionPolicy-$counter"
+                    'access_policy' = "cc_access_policy-$counter"
+                },@{
+                    'name' = 'ssn'
+                    'operation' = 'reveal'
+                    'protection_policy' = "cvv_ProtectionPolicy-$counter"
+                    'access_policy' = "cc_access_policy-$counter"
+                }
+            )
+        }
+    )
+}
+$jsonBody = $body | ConvertTo-Json -Depth 5
+$response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+$dpgPolicyId = $response.id
+
+#Creating local CA
+Write-Output "Creating local CA..."
+$url = "https://$kms/api/v1/ca/local-cas"
+$body = @{
+    'name' = "local-CA-$counter"
+    'algorithm' = 'RSA'
+    'size' = 2048
+    'cn' = 'kylo.com'
+    'dnsNames' = @('*.thalesgroup.com', '*.thalesgroup.net')
+    'emailAddresses' = @('contact@thalesgroup.com')
+    'ipAddresses' = @('1.1.1.1')
+    'names' = @(
+        @{
+            'O' = 'Thales'
+            'OU' = 'RnD'
+            'C' = 'US'
+            'ST' = 'MD'
+            'L' = 'Belcamp'
+        }
+    )
+}
+$jsonBody = $body | ConvertTo-Json -Depth 5
+$response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+$caId = $response.id
+
+#Final setup...creating client application
+Write-Output "Creating client profile..."
+$url = "https://$kms/api/v1/data-protection/client-profiles"
+$body = @{
+    'name' = "CC_profile-$counter"
+    'nae_iface_port' = 9005
+    'app_connector_type' = 'DPG'
+    'policy_id' = $dpgPolicyId
+    'lifetime' = '30d'
+    'cert_duration' = 730
+    'max_clients' = 200
+    'ca_id' = $caId
+    'csr_parameters' = @{
+        'csr_cn' = 'admin'
+        'csr_country' = ''
+        'csr_state' = ''
+        'csr_city' = ''
+        'csr_org_name' = ''
+        'csr_org_unit' = ''
+        'csr_email' = ''
+    }
+    'configurations' = @{
+        'verify_ssl_certificate' = $false
+        'use_persistent_connections' = $true
+        'log_level' = 'DEBUG'
+        'tls_to_appserver' = @{
+            'tls_skip_verify' = $true
+            'tls_enabled' = $false
+        }
+        'auth_method_used' = @{
+            'scheme_name' = 'Basic'
+        }
+    }
+}
+$jsonBody = $body | ConvertTo-Json -Depth 5
+$response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+$appId = $response.id
+$appId.reg_token
