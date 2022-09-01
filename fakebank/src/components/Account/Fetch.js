@@ -2,15 +2,18 @@ import { React, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { Accordion, Container, Row, Col } from 'react-bootstrap';
+import useToken from '../../useToken';
 
 export default function Fetch() {
     const { state } = useLocation();
     const { q } = state;
     const [accounts, setAccounts] = useState("");
+    const { token } = useToken();
+    var decodedToken = jwt_decode(token);
 
     useEffect(() => {
         axios
-          .get('http://ciphertrust:9005/api/fakebank/accounts/' + q)
+          .get('http://localhost:8081/api/proxy/accounts/'+decodedToken.preferred_username+'/'+q)
           .then((res) => {
             setAccounts(res.data.accounts);
           })

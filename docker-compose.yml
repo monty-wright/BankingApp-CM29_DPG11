@@ -1,4 +1,4 @@
-version: '3.1'
+version: '3.7'
 
 services:
 
@@ -11,6 +11,26 @@ services:
 #      context: ./nginx
 #    ports:
 #      - "3050:80"
+      
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    restart: always
+    command: --quiet
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: Gemalto01!
+      MONGO_INITDB_DATABASE: dpg
+    ports:
+      - 27017:27017
+    volumes:
+      - ./mongo/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+#    healthcheck:
+#      test: echo 'db.runCommand("ping").ok' | mongo mongodb:27017/dpg --quiet
+#      interval: 10s
+#      timeout: 10s
+#      retries: 5
+#      start_period: 40s
       
   frontend:
     stdin_open: true
@@ -33,6 +53,9 @@ services:
       context: ./dpgBankDemo
     ports:
       - 8080:8080
+#    depends_on:
+#      mongodb:
+#        condition: service_healthy
       
   proxy:
     container_name: proxy

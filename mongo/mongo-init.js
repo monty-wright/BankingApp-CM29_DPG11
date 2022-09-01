@@ -1,12 +1,12 @@
 db.createUser(
-        {
-            user: "root",
-            pwd: "root",
-            roles: [
-                {
-                    role: "readWrite",
-                    db: "dpg"
-                }
-            ]
-        }
+	{
+		user: "root",
+		pwd: "root",
+		roles: [
+			{
+				role: "readWrite",
+				db: "dpg"
+			}
+		]
+	}
 );
