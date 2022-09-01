@@ -1,6 +1,7 @@
 import { React, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import axios from 'axios';
+import jwt_decode from "jwt-decode";
 import { Accordion, Container, Row, Col } from 'react-bootstrap';
 import useToken from '../../useToken';
 
