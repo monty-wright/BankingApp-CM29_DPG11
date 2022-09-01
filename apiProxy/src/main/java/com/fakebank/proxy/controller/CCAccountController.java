@@ -81,7 +81,7 @@ public class CCAccountController {
 			@PathVariable("account") String accountId) {
 		String dockerUri = "http://ciphertrust:9005/api/fakebank/accounts/"+accountId;
 		
-		String plainCreds = accountId + ":KeySecure01!";
+		String plainCreds = requestor + ":KeySecure01!";
 		byte[] plainCredsBytes = plainCreds.getBytes();
 		byte[] base64CredsBytes = Base64.getEncoder().encode(plainCredsBytes);
 		String base64Creds = new String(base64CredsBytes);
