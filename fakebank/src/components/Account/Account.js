@@ -11,7 +11,7 @@ function Account() {
 
   useEffect(() => {
     axios
-      .get('http://localhost:8080/api/fakebank/accounts/' + decodedToken.preferred_username)
+      .get('http://ciphertrust:9005/api/fakebank/accounts/' + decodedToken.preferred_username)
       .then((res) => {
         setAccounts(res.data.accounts);
       })

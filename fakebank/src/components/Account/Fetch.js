@@ -10,7 +10,7 @@ export default function Fetch() {
 
     useEffect(() => {
         axios
-          .get('http://localhost:8080/api/fakebank/accounts/' + q)
+          .get('http://ciphertrust:9005/api/fakebank/accounts/' + q)
           .then((res) => {
             setAccounts(res.data.accounts);
           })

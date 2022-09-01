@@ -1,7 +1,7 @@
 $username = "admin"
 $password = "Entrust@2018"
 $kms = "20.127.6.212"
-$counter = "dpg-aj-8"
+$counter = "911_1"
 
 #Some house keeping stuff
 add-type @"
@@ -33,8 +33,7 @@ $response = Invoke-RestMethod -Method 'Post' -Uri $Url -Body $body
 $jwt = $response.jwt
 
 #Generic header for next set of API calls
-$headers = @{
-    
+$headers = @{    
     Authorization="Bearer $jwt"
 }
 
@@ -126,7 +125,7 @@ $url = "https://$kms/api/v1/data-protection/user-sets"
 $body = @{
     'name' = "enctextuserset-$counter"
     'description' = "encrypted text user set for everyone else"
-    'users' = @('generaluserset')
+    'users' = @('everyoneelse')
 }
 $jsonBody = $body | ConvertTo-Json -Depth 5
 $response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
@@ -198,23 +197,35 @@ $body = @{
                     'name' = 'ssn'
                     'operation' = 'protect'
                     'protection_policy' = "SSN_ProtectionPolicy-$counter"
+                },@{
+                    'name' = 'dob'
+                    'operation' = 'protect'
+                    'protection_policy' = "SSN_ProtectionPolicy-$counter"
                 }
             )
+        },
+        @{
+            'api_url' = '/api/fakebank/accounts/{id}'            
             'json_response_get_tokens' = @(
                 @{
-                    'name' = 'cvv'
+                    'name' = 'ccCvv'
                     'operation' = 'reveal'
                     'protection_policy' = "cvv_ProtectionPolicy-$counter"
                     'access_policy' = "cc_access_policy-$counter"
                 },@{
                     'name' = 'ccNumber'
                     'operation' = 'reveal'
-                    'protection_policy' = "cvv_ProtectionPolicy-$counter"
+                    'protection_policy' = "CC_ProtectionPolicy-$counter"
                     'access_policy' = "cc_access_policy-$counter"
                 },@{
                     'name' = 'ssn'
                     'operation' = 'reveal'
-                    'protection_policy' = "cvv_ProtectionPolicy-$counter"
+                    'protection_policy' = "SSN_ProtectionPolicy-$counter"
+                    'access_policy' = "cc_access_policy-$counter"
+                },@{
+                    'name' = 'dob'
+                    'operation' = 'reveal'
+                    'protection_policy' = "SSN_ProtectionPolicy-$counter"
                     'access_policy' = "cc_access_policy-$counter"
                 }
             )
@@ -287,4 +298,52 @@ $body = @{
 $jsonBody = $body | ConvertTo-Json -Depth 5
 $response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
 $regToken = $response.reg_token
-Write-Output "REG_TOKEN=$regToken"
+
+#ohhh...this one is the final step...adding few users
+Write-Output "Creating sample users..."
+#ccaccountowner, cccustomersupport, everyoneelse --- password is same for all...KeySecure01!
+$url = "https://$kms/api/v1/usermgmt/users"
+$body = @{
+    'email' = 'ccaccountowner@local'
+    'name' = 'ccaccountowner'
+    'username' = 'ccaccountowner'
+    'password' = 'KeySecure01!'
+    'app_metadata' = @{}
+    'user_metadata' = @{}
+}
+$jsonBody = $body | ConvertTo-Json -Depth 5
+Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+
+$url = "https://$kms/api/v1/usermgmt/users"
+$body = @{
+    'email' = 'cccustomersupport@local'
+    'name' = 'cccustomersupport'
+    'username' = 'cccustomersupport'
+    'password' = 'KeySecure01!'
+    'app_metadata' = @{}
+    'user_metadata' = @{}
+}
+$jsonBody = $body | ConvertTo-Json -Depth 5
+Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+
+$url = "https://$kms/api/v1/usermgmt/users"
+$body = @{
+    'email' = 'everyoneelse@local'
+    'name' = 'everyoneelse'
+    'username' = 'everyoneelse'
+    'password' = 'KeySecure01!'
+    'app_metadata' = @{}
+    'user_metadata' = @{}
+}
+$jsonBody = $body | ConvertTo-Json -Depth 5
+Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+
+
+Write-Output "`n"
+Write-Output ">>>>> Completed Configuring your CipherTrust Manager Instance <<<<<"
+Write-Output " __________________________________________________________________________"
+Write-Output "| Replace below variables in the docker-compose.yml file in current folder |"
+Write-Output "| REG_TOKEN: $regToken"
+Write-Output "| KMS: $kms"
+Write-Output "| CMIP: https://=$kms"
+Write-Output "|__________________________________________________________________________|"

@@ -65,7 +65,7 @@ public class CCAccountController {
 		
 		String dockerUri = "http://ciphertrust:9005/api/fakebank/account";
 		String devUri = "http://localhost:8080/api/fakebank/account";
-		String createResponse = restTemplate.postForObject(devUri, newAccount, String.class);
+		String createResponse = restTemplate.postForObject(dockerUri, newAccount, String.class);
 		
 		return createResponse;
 	}
