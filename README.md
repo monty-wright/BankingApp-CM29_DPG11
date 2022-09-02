@@ -1,5 +1,8 @@
 # Sample Bank Application :: Turnkey Data Protection and Access Control
 
+## About this sample app
+This is a sample app that has been created to mimic some of the very basic functionalities of a banking app and showcase how adding a Thales Data Protection Gateway (DPG) can solve a really complex problem of apply data protection, reveal, and masking based on policies defined at a higher level.
+
 ## Architecture
 ![image](https://user-images.githubusercontent.com/111074839/188156345-ecc4a1f8-5f19-4b4a-b951-fe7af6ad3b54.png)
 
