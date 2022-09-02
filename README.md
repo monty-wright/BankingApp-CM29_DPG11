@@ -1,7 +1,7 @@
 # Sample Bank Application :: Turnkey Data Protection and Access Control
 
 ## Architecture
-![image](https://user-images.githubusercontent.com/111074839/187699739-a6065f0d-81a4-4f49-ab95-cdbdaaed8e99.png)
+![image](https://user-images.githubusercontent.com/111074839/188156345-ecc4a1f8-5f19-4b4a-b951-fe7af6ad3b54.png)
 
 ### Understanding the Architecture in few bullets
 * The purpose of running DPG container as the sidecar is to allow you to write you application as if nothing has really changed. You can continue invoking your business layer APIs via DPG endpoint and security will come as a bonus without any effort.
