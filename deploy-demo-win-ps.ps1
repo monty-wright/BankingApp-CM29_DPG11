@@ -1,7 +1,7 @@
 $username = "admin"
 $password = "Entrust@2018"
 $kms = "20.127.6.212"
-$counter = "911_1"
+$counter = "dosa"
 
 #Some house keeping stuff
 add-type @"
@@ -36,6 +36,57 @@ $jwt = $response.jwt
 $headers = @{    
     Authorization="Bearer $jwt"
 }
+
+#Creating local CA
+Write-Output "Creating local CA..."
+$url = "https://$kms/api/v1/ca/local-cas"
+$body = @{
+    'name' = "local-CA-$counter"
+    'algorithm' = 'RSA'
+    'size' = 4096
+    'cn' = 'CM Root CA'
+    'emailAddresses' = @('contact@thalesgroup.com')
+    'names' = @(
+        @{
+            'O' = 'Thales'
+            'C' = 'US'
+            'ST' = 'TX'
+            'L' = 'Austin'
+        }
+    )
+}
+$jsonBody = $body | ConvertTo-Json -Depth 5
+$response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+$caId = $response.id
+
+
+#Activate local CA
+Write-Output "Activating above CA..."
+$url = "https://$kms/api/v1/ca/local-cas/$caID/self-sign"
+$body = @{
+    'duration' = 365
+}
+$jsonBody = $body | ConvertTo-Json -Depth 5
+$response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+
+#Creating network interface NAE
+Write-Output "Creating NAE network interface..."
+$url = "https://$kms/api/v1/configs/interfaces"
+$body = @{
+    'mode' = 'tls-cert-opt-pw-opt'
+	'cert_user_field' = 'CN'
+    'auto_gen_ca_id' = $caId
+    'trusted_cas' = @{
+        'local' = @( $caId )
+        'external' = @()
+    }
+    'port' = 9090
+    'network_interface' = 'all'
+}
+$jsonBody = $body | ConvertTo-Json -Depth 5
+$jsonBody
+$response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+$naeId = $response.id
 
 #Creating Character Set
 Write-Output "Creating Character Set..."
@@ -236,37 +287,12 @@ $jsonBody = $body | ConvertTo-Json -Depth 5
 $response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
 $dpgPolicyId = $response.id
 
-#Creating local CA
-Write-Output "Creating local CA..."
-$url = "https://$kms/api/v1/ca/local-cas"
-$body = @{
-    'name' = "local-CA-$counter"
-    'algorithm' = 'RSA'
-    'size' = 2048
-    'cn' = 'kylo.com'
-    'dnsNames' = @('*.thalesgroup.com', '*.thalesgroup.net')
-    'emailAddresses' = @('contact@thalesgroup.com')
-    'ipAddresses' = @('1.1.1.1')
-    'names' = @(
-        @{
-            'O' = 'Thales'
-            'OU' = 'RnD'
-            'C' = 'US'
-            'ST' = 'MD'
-            'L' = 'Belcamp'
-        }
-    )
-}
-$jsonBody = $body | ConvertTo-Json -Depth 5
-$response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
-$caId = $response.id
-
 #Final setup...creating client application
 Write-Output "Creating client profile..."
 $url = "https://$kms/api/v1/data-protection/client-profiles"
 $body = @{
     'name' = "CC_profile-$counter"
-    'nae_iface_port' = 9005
+    'nae_iface_port' = 9090
     'app_connector_type' = 'DPG'
     'policy_id' = $dpgPolicyId
     'lifetime' = '30d'
@@ -288,7 +314,7 @@ $body = @{
         'log_level' = 'DEBUG'
         'tls_to_appserver' = @{
             'tls_skip_verify' = $true
-            'tls_enabled' = $false
+            'tls_enabled' = $true
         }
         'auth_method_used' = @{
             'scheme_name' = 'Basic'
