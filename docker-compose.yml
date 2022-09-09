@@ -1,17 +1,6 @@
 version: '3.7'
 
-services:
-
-#  nginx:
-#    depends_on:
-#      - frontend
-#    restart: always
-#    build:
-#      dockerfile: Dockerfile
-#      context: ./nginx
-#    ports:
-#      - "3050:80"
-      
+services:      
   mongodb:
     image: mongo:latest
     container_name: mongodb
@@ -25,12 +14,6 @@ services:
       - 27017:27017
     volumes:
       - ./mongo/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
-#    healthcheck:
-#      test: echo 'db.runCommand("ping").ok' | mongo mongodb:27017/dpg --quiet
-#      interval: 10s
-#      timeout: 10s
-#      retries: 5
-#      start_period: 40s
       
   frontend:
     stdin_open: true
@@ -53,9 +36,6 @@ services:
       context: ./dpgBankDemo
     ports:
       - 8080:8080
-#    depends_on:
-#      mongodb:
-#        condition: service_healthy
       
   proxy:
     container_name: proxy
@@ -69,7 +49,7 @@ services:
     image: thalesciphertrust/ciphertrust-data-protection-gateway:latest
     container_name: ciphertrust
     environment:
-      - REG_TOKEN=wIhkyNwg4u4UPltBU1JDHo2LqM25TZmu6TXk9Fg8GZ7PQ9UDWZzuoJJX94B56T59
+      - REG_TOKEN=cVQ62nqqz7viOQSNvHaY6qd5hSReGtLtO21KSXbzy9nbyiuvOxuHuwFD9mDUhbYf
       - DESTINATION_URL=http://api:8080
       - DPG_PORT=9005
       - TLS_ENABLED=false

@@ -1,7 +1,7 @@
 $username = "admin"
 $password = "Entrust@2018"
 $kms = "20.127.6.212"
-$counter = "dosa"
+$counter = "blah12"
 
 #Some house keeping stuff
 add-type @"
@@ -38,6 +38,7 @@ $headers = @{
 }
 
 #Creating local CA
+<#
 Write-Output "Creating local CA..."
 $url = "https://$kms/api/v1/ca/local-cas"
 $body = @{
@@ -57,8 +58,7 @@ $body = @{
 }
 $jsonBody = $body | ConvertTo-Json -Depth 5
 $response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
-$caId = $response.id
-
+$caId = 'kylo:kylo:naboo:localca:12b0233e-d233-4856-bb8a-e22a8ff6e614'
 
 #Activate local CA
 Write-Output "Activating above CA..."
@@ -68,25 +68,31 @@ $body = @{
 }
 $jsonBody = $body | ConvertTo-Json -Depth 5
 $response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+#>
+
+#Fetching local root CA ID
+$url = "https://$kms/api/v1/ca/local-cas?subject=/C=US/ST=TX/L=Austin/O=Thales/CN=CipherTrust Root CA"
+$response = Invoke-RestMethod -Method 'Get' -Uri $url -Headers $headers -ContentType 'application/json'
+$caID = $response.resources[0].uri
 
 #Creating network interface NAE
 Write-Output "Creating NAE network interface..."
 $url = "https://$kms/api/v1/configs/interfaces"
 $body = @{
-    'mode' = 'tls-cert-opt-pw-opt'
-	'cert_user_field' = 'CN'
+    'cert_user_field' = 'CN'
+    'mode' = 'tls-cert-pw-opt'
     'auto_gen_ca_id' = $caId
     'trusted_cas' = @{
-        'local' = @( $caId )
+        'local' = @(
+            $caId
+            )
         'external' = @()
     }
-    'port' = 9090
+    'port' = 9005
     'network_interface' = 'all'
 }
 $jsonBody = $body | ConvertTo-Json -Depth 5
-$jsonBody
 $response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
-$naeId = $response.id
 
 #Creating Character Set
 Write-Output "Creating Character Set..."
@@ -292,7 +298,7 @@ Write-Output "Creating client profile..."
 $url = "https://$kms/api/v1/data-protection/client-profiles"
 $body = @{
     'name' = "CC_profile-$counter"
-    'nae_iface_port' = 9090
+    'nae_iface_port' = 9005
     'app_connector_type' = 'DPG'
     'policy_id' = $dpgPolicyId
     'lifetime' = '30d'
