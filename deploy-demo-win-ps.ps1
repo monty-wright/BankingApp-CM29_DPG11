@@ -1,7 +1,7 @@
 $username = "admin"
 $password = "Entrust@2018"
 $kms = "20.127.6.212"
-$counter = "blah12"
+$counter = "blah15"
 
 #Some house keeping stuff
 add-type @"
@@ -370,12 +370,28 @@ $body = @{
 $jsonBody = $body | ConvertTo-Json -Depth 5
 Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
 
+[string[]]$fileContent = Get-Content ".\docker-compose-template.yml"
+$content = ''
+foreach ($line in $fileContent) { $content = $content + "`n" + $line }
+$yamlObj = ConvertFrom-YAML $content
+$yamlObj.services.ciphertrust.environment = @(
+    "REG_TOKEN=$regToken",
+    "DESTINATION_URL=http://api:8080",
+    "TLS_ENABLED=false",
+    "KMS=$kms",
+    "DPG_PORT=9005"
+)
+$yaml = ConvertTo-YAML $yamlObj | .\yq.exe
+Set-Content -Path ".\docker-compose.yml" -Value $yaml
 
 Write-Output "`n"
 Write-Output ">>>>> Completed Configuring your CipherTrust Manager Instance <<<<<"
 Write-Output " __________________________________________________________________________"
-Write-Output "| Replace below variables in the docker-compose.yml file in current folder |"
+Write-Output "| Replaced below variables in the docker-compose.yml file in current folder |"
 Write-Output "| REG_TOKEN: $regToken"
 Write-Output "| KMS: $kms"
 Write-Output "| CMIP: https://=$kms"
 Write-Output "|__________________________________________________________________________|"
+
+Write-Output "Running demo application now..."
+docker compose up

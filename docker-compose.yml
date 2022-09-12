@@ -1,62 +1,56 @@
-version: '3.7'
-
-services:      
+networks:
+  db_net:
+    driver: bridge
+services:
+  api:
+    environment:
+      CMIP: https://20.127.6.212
+    ports:
+      - 8080:8080
+    build:
+      context: ./dpgBankDemo
+      dockerfile: Dockerfile
+    container_name: api
+  ciphertrust:
+    environment:
+      - REG_TOKEN=yMldtRw3KTydlkZVztUqQ1wxmse8KfqC9Pbo2LEEHk4MtkxEY1Ok98ErgFKa6TJR
+      - DESTINATION_URL=http://api:8080
+      - TLS_ENABLED=false
+      - KMS=20.127.6.212
+      - DPG_PORT=9005
+    ports:
+      - 9005:9005
+    container_name: ciphertrust
+    image: thalesciphertrust/ciphertrust-data-protection-gateway:latest
+  frontend:
+    build:
+      context: ./fakebank
+      dockerfile: Dockerfile
+    ports:
+      - 3050:3000
+    stdin_open: true
+    volumes:
+      - /app/node_modules
+      - ./fakebank:/app
+    container_name: frontend
   mongodb:
     image: mongo:latest
-    container_name: mongodb
     restart: always
-    command: --quiet
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: Gemalto01!
       MONGO_INITDB_DATABASE: dpg
+    command: --quiet
     ports:
       - 27017:27017
     volumes:
       - ./mongo/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
-      
-  frontend:
-    stdin_open: true
-    container_name: frontend
-    build:
-      dockerfile: Dockerfile
-      context: ./fakebank
-    volumes:
-      - /app/node_modules
-      - ./fakebank:/app
-    ports:
-      - 3050:3000
-      
-  api:
-    environment:
-      CMIP: https://20.127.6.212
-    container_name: api
-    build:
-      dockerfile: Dockerfile
-      context: ./dpgBankDemo
-    ports:
-      - 8080:8080
-      
+    container_name: mongodb
   proxy:
-    container_name: proxy
-    build:
-      dockerfile: Dockerfile
-      context: ./apiProxy
     ports:
       - 8081:8081
-
-  ciphertrust:
-    image: thalesciphertrust/ciphertrust-data-protection-gateway:latest
-    container_name: ciphertrust
-    environment:
-      - REG_TOKEN=cVQ62nqqz7viOQSNvHaY6qd5hSReGtLtO21KSXbzy9nbyiuvOxuHuwFD9mDUhbYf
-      - DESTINATION_URL=http://api:8080
-      - DPG_PORT=9005
-      - TLS_ENABLED=false
-      - KMS=20.127.6.212
-    ports:
-      - 9005:9005
-      
-networks:
-  db_net:
-    driver: bridge
+    build:
+      context: ./apiProxy
+      dockerfile: Dockerfile
+    container_name: proxy
+version: "3.7"
