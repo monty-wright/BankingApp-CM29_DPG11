@@ -18,12 +18,13 @@ Pre-requisites
 * Docker itself
 
 ## Architecture
-**Updated Image to Come Here!!!**
+![image](https://user-images.githubusercontent.com/111074839/189827400-3377df49-b028-4f32-bca3-087ce61fb0c4.png)
 
 ### Understanding the Architecture in few bullets
-* Frontend application in react will take user credentials and send request to CipherTrust Manager APIs to authorize user and acquire JWT bearer token
-* Frontend application to provide interface to account owner to create a new account and retrieve details. All the data will be persisten in the embedded MongoDB container and revealed based on policies. To change the behaviour, no need to change application code, just log in to the CipherTrust Manager platform and make changes there
-* DPG sidecar container will be an entry point whereever sensitive data handling is required...e.g. storing PCI data into database or retrieving it
+* User authenticates with Ciphertrust Manager to acquire JWT token
+* Admin applies protection and reveal policy suitable for the data that needs to be protected
+* Ciphertrust Data Protection Gateway (DPG) running as a sidecar within your existing environment
+* All APIs are routed to DPG so that correct policies are applied
 
 ## Deployment Script - PowerShell
 The helper script provided along with the project would help you in setting up some boilerplate configuration that will allow you to run the demo out of the box.
