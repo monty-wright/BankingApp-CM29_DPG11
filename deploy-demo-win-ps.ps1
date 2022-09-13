@@ -1,7 +1,7 @@
 $username = "admin"
-$password = "Entrust@2018"
-$kms = "20.127.6.212"
-$counter = "blah15"
+$password = "ChangeIt!"
+$kms = "1.1.1.1"
+$counter = "demo"
 
 #Some house keeping stuff
 add-type @"
