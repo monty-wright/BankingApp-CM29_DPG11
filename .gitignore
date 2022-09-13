@@ -128,4 +128,3 @@ dist
 /.metadata/
 deploy-demo-win-ps-local.ps1
 docker-compose.yml
-docker-compose.yml
