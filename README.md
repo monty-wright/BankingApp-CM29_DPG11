@@ -18,7 +18,7 @@ Pre-requisites
 * Docker itself
 
 ## Architecture
-![image](https://user-images.githubusercontent.com/111074839/188156345-ecc4a1f8-5f19-4b4a-b951-fe7af6ad3b54.png)
+**Updated Image to Come Here!!!**
 
 ### Understanding the Architecture in few bullets
 * Frontend application in react will take user credentials and send request to CipherTrust Manager APIs to authorize user and acquire JWT bearer token
