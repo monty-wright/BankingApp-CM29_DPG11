@@ -125,6 +125,6 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
-/.metadata/
+.metadata/
 deploy-demo-win-ps-local.ps1
 docker-compose.yml
