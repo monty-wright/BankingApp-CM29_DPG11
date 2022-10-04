@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import useToken from '../../useToken';
 import jwt_decode from "jwt-decode";
 
 async function createAccount(AccDetails) {
@@ -14,7 +13,7 @@ async function createAccount(AccDetails) {
 }
 
 export default function CreateAccount() {
-    const { token } = useToken();
+    let token = sessionStorage.getItem('token');
     var decodedToken = jwt_decode(token);
     
     const [fullName, setFullName] = useState();

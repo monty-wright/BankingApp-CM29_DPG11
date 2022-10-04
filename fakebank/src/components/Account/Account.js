@@ -1,12 +1,11 @@
 import {React, useEffect, useState} from 'react';
-import useToken from '../../useToken';
 import jwt_decode from "jwt-decode";
 import axios from 'axios';
 import { data } from 'autoprefixer';
 
 function Account() {
+  let token = sessionStorage.getItem('token');
   const [accounts, setAccounts] = useState("");
-  const { token } = useToken();
   var decodedToken = jwt_decode(token);
 
   useEffect(() => {
@@ -34,7 +33,7 @@ function Account() {
     <div className="container px-6 mx-auto">
       {/* Remove class [ h-64 ] when adding a card block */}
       <div className="rounded shadow relative bg-white z-10 -mt-8 mb-8 w-full">
-      
+      <h2>Your Credit Card Accounts</h2>
       {/* <Accordion> */}
       {Object.entries(cards).map((entry) => {
         const card = entry[0];

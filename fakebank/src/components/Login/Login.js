@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import './Login.css';
 import "bootstrap/dist/css/bootstrap.min.css"
+import { useNavigate } from 'react-router-dom';
 
 async function loginUser(credentials) {
  console.log(credentials);
@@ -15,7 +16,8 @@ async function loginUser(credentials) {
    .then(data => data.json())
 }
 
-export default function Login({ setToken }) {
+export default function Login() {
+  const navigate = useNavigate();
   const [username, setUserName] = useState();
   const [password, setPassword] = useState();
 
@@ -26,9 +28,9 @@ export default function Login({ setToken }) {
       username,
       password
     });
-    setToken({"token":auth_response.jwt});*/
-    
-    setToken({"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJjZGNkMTMyYy1iZWQzLTRjMDQtYWEzMS03Zjk1MzkxMTMyNzYiLCJzdWIiOiJsb2NhbHw2MjViZGYxMi1kNjBjLTRjZjUtOThhNy1iYjlhMGE1ZDNmNTIiLCJpc3MiOiJreWxvIiwiYWNjIjoia3lsbyIsInByZWZlcnJlZF91c2VybmFtZSI6ImFkbWluIiwiY3VzdCI6eyJkb21haW5faWQiOiIwMDAwMDAwMC0wMDAwLTAwMDAtMDAwMC0wMDAwMDAwMDAwMDAiLCJncm91cHMiOlsiYWRtaW4iXSwic2lkIjoiYjU2Njc3M2EtOGM2YS00Nzk2LTkzNWItNjA5MTllZThkZDI0Iiwiem9uZV9pZCI6IjAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDAwMCJ9LCJqd3RpZCI6IjZlYzI2MjU1LWMzMTItNDM3Zi1iMzgzLTQzNmNiZDhkMmE5MCIsImlhdCI6MTY2NDg4OTUyNiwiZXhwIjoxNjY0ODg5ODI2fQ.SAU9v182cpfHBz4j8YViLi7cP4ddgFtnGvKAFQ3rJJ8"});
+    setToken({"token":auth_response.jwt});*/    
+    sessionStorage.setItem('token',"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJjZGNkMTMyYy1iZWQzLTRjMDQtYWEzMS03Zjk1MzkxMTMyNzYiLCJzdWIiOiJsb2NhbHwyNzIxZGM4MC02NjZjLTQ3NGQtYjNkNS00MDUxZDc0NjQ1MzEiLCJpc3MiOiJreWxvIiwiYWNjIjoia3lsbyIsInByZWZlcnJlZF91c2VybmFtZSI6ImNjYWNjb3VudG93bmVyIiwiY3VzdCI6eyJkb21haW5faWQiOiIwMDAwMDAwMC0wMDAwLTAwMDAtMDAwMC0wMDAwMDAwMDAwMDAiLCJzaWQiOiIwZTY3ZDQ3NS0yMzEzLTQxNjEtOTc3MS01NWFhMTYyMWJlYWQiLCJ6b25lX2lkIjoiMDAwMDAwMDAtMDAwMC0wMDAwLTAwMDAtMDAwMDAwMDAwMDAwIn0sImp3dGlkIjoiYzQxNzIwZDctMjQ5My00MzJiLWE5N2UtN2VmNWIxMGI5NTc1IiwiaWF0IjoxNjY0OTAyMDY2LCJleHAiOjE2NjQ5MDIzNjZ9.-MG-NkC86V9eSo0K5Gs0ZtRdSIIk1itRBytgOlFyfHk");
+    navigate('/auth/user/home');
   }
 
   return(
@@ -67,7 +69,3 @@ export default function Login({ setToken }) {
     </div>
   )
 }
-
-Login.propTypes = {
-  setToken: PropTypes.func.isRequired
-};
