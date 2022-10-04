@@ -19,7 +19,7 @@ export default function Fetch() {
             setAccounts(res.data.accounts);
           })
           .catch((err) => console.log(err));
-      });  
+      }, []);  
       const cards = {};
       for (const account of accounts) {
         if (account.friendlyName in cards) {

@@ -20,3 +20,7 @@ code {
   padding-bottom: 10px;
   padding-top: 0px;
 }
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

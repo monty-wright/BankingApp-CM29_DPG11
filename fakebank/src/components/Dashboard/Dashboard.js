@@ -1,7 +1,4 @@
 import React from 'react';
-import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -61,11 +58,11 @@ export const data = {
 
 export default function Dashboard() {
   return(
-    <Container>
-      <Row>
-        <Col><Line options={options} data={data} />;</Col>
-        <Col>2 of 2</Col>
-      </Row>
-    </Container>
+    <div className="container px-6 mx-auto">
+        {/* Remove class [ h-64 ] when adding a card block */}
+        <div className="rounded shadow relative bg-white z-10 -mt-8 mb-8 w-full">
+          <Line options={options} data={data} />
+        </div>
+    </div>
   );
 }
