@@ -213,7 +213,7 @@ function UserLayout() {
                                                                 <circle cx={12} cy={7} r={4} />
                                                                 <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
                                                             </svg>
-                                                            <span className="ml-2">Logout</span>
+                                                            <span className="ml-2"><a href="/logout" className="text-black hover:text-blue-800 visited:text-black no-underline">Logout</a></span>
                                                         </div>
                                                     </li>
                                                 </ul>
@@ -273,7 +273,7 @@ function UserLayout() {
     var dateNow = new Date();
     
     let authToken = false;
-    if(token && (decodedToken.exp * 1000 > dateNow.getTime())) {
+    if(token && (decodedToken.exp * 1000 > dateNow.getTime()) && (decodedToken.preferred_username === 'ccaccountowner')) {
         authToken = true;
     } else {
         authToken = true;
