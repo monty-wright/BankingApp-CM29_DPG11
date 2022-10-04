@@ -1,14 +1,36 @@
 import { Outlet, Navigate } from "react-router-dom";
 import {React, useState} from 'react';
 import jwt_decode from "jwt-decode";
+import Modal from 'react-bootstrap/Modal';
+import Button from 'react-bootstrap/Button';
+import Form from 'react-bootstrap/Form';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import { useNavigate } from "react-router-dom";
 
 function AdminLayout() {
     const [show, setShow] = useState(false);
     const [product, setProduct] = useState(false);
     const [profile, setProfile] = useState(false);
+    const [userName, setUserName] = useState();
+
+    const navigate = useNavigate();
+
+
+    const handleClose = () => setShow(false);
+    const handleShow = () => {
+        setShow(true);
+    }
+    const handleSubmit = async event => {
+        event.preventDefault();
+        console.log(userName);
+        navigate('/auth/admin/listAccounts', { state: { q: userName } });
+        handleClose();
+    };
 
     const CustomNavbar = ({ onSelect, activeKey, ...props }) => {
         return (
+            <>
             <div className="App" id="outer-container">
                 <div id="page-wrap">
                     <div className="bg-gray-200 pb-10">                
@@ -156,7 +178,7 @@ function AdminLayout() {
                                     <li className="hover:text-indigo-700 cursor-pointer h-full flex items-center text-sm text-gry-800 mx-10 tracking-normal relative">
                                         {product ? (
                                             <ul className="bg-white shadow rounded py-1 w-32 left-0 mt-16 -ml-4 absolute  top-0">
-                                                <li className="cursor-pointer text-gray-600 text-sm leading-3 tracking-normal py-3 hover:bg-gray-100 px-3 font-normal"><a href="/auth/admin/listAccounts" className="text-black hover:text-blue-800 visited:text-black no-underline">List</a></li>
+                                                <li className="cursor-pointer text-gray-600 text-sm leading-3 tracking-normal py-3 hover:bg-gray-100 px-3 font-normal"><a onClick={handleShow} className="text-black hover:text-blue-800 visited:text-black no-underline">List</a></li>
                                             </ul>
                                         ) : (
                                             ""
@@ -248,6 +270,41 @@ function AdminLayout() {
                     </div>
                 </div>
             </div>
+            <Modal show={show} onHide={handleClose}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Search Account by Username</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form onSubmit={handleSubmit}>
+                    <Row>
+                        <Col xs={6}>
+                            <Form.Group className="mb-3" controlId="formBasicUsername">
+                                <Form.Label>Username</Form.Label>
+                                <Form.Control type="text" placeholder="UserName" onChange={e => setUserName(e.target.value)} />
+                            </Form.Group>
+                        </Col>
+                        <Col xs={6}>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col xs={12}>
+                            <Button variant="primary" type="submit">
+                                Submit
+                            </Button>
+                        </Col>
+                    </Row>
+                    </Form>        
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleClose}>
+                    Close
+                    </Button>
+                    <Button variant="primary" onClick={handleClose}>
+                    Save Changes
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+            </>
         )
     };
 
@@ -259,7 +316,7 @@ function AdminLayout() {
     if(token && (decodedToken.exp * 1000 > dateNow.getTime()) && (decodedToken.preferred_username === 'cccustomersupport')) {
         authToken = true;
     } else {
-        authToken = true;
+        authToken = false;
     }
     return (
       authToken ? <><CustomNavbar /> <Outlet /></> : <Navigate to="/login"/>

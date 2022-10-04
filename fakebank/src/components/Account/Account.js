@@ -10,14 +10,14 @@ function Account() {
 
   useEffect(() => {
     console.log(decodedToken.preferred_username);
-    /*axios
+    axios
       .get('http://localhost:8081/api/proxy/accounts/'+decodedToken.preferred_username+'/'+ decodedToken.preferred_username)
       .then((res) => {
         setAccounts(res.data.accounts);
       })
-      .catch((err) => console.log(err));*/
-      data = {"userName":"ccaccountowner","accounts":[{"expDate":"12/04/2025","ccNumber":"2000101000100730-2184-1768-3759","cvv":"373","friendlyName":"Walmart MC","balance":"0"},{"expDate":"12/04/2025","ccNumber":"2000101000100730-2184-1768-3759","cvv":"373","friendlyName":"Costco MC","balance":"0"}]}
-      setAccounts(data.accounts);
+      .catch((err) => console.log(err));
+      //data = {"userName":"ccaccountowner","accounts":[{"expDate":"12/04/2025","ccNumber":"2000101000100730-2184-1768-3759","cvv":"373","friendlyName":"Walmart MC","balance":"0"},{"expDate":"12/04/2025","ccNumber":"2000101000100730-2184-1768-3759","cvv":"373","friendlyName":"Costco MC","balance":"0"}]}
+      //setAccounts(data.accounts);
     }, []);
   
   const cards = {};
@@ -33,8 +33,9 @@ function Account() {
     <div className="container px-6 mx-auto">
       {/* Remove class [ h-64 ] when adding a card block */}
       <div className="rounded shadow relative bg-white z-10 -mt-8 mb-8 w-full">
-      <h2>Your Credit Card Accounts</h2>
-      {/* <Accordion> */}
+      <div className="w-full flex items-center justify-center">
+        <h3 className="bg-blue-100 text-black justify-center items-center">My Credit Cards</h3>
+      </div>
       {Object.entries(cards).map((entry) => {
         const card = entry[0];
         const details = entry[1];
@@ -67,30 +68,6 @@ function Account() {
           <hr />
           </>
         );
-        /*
-          <Accordion.Item eventKey={card} key={card}>
-            <Accordion.Header>{card}</Accordion.Header>
-            <Accordion.Body>
-              <Container>
-                <Row>
-                  <Col sm={3}>Credit Card Number</Col>
-                  <Col sm={3}>{details[0].ccNumber}</Col>
-                </Row>
-                <Row>
-                  <Col sm={3}>CVV</Col>
-                  <Col sm={3}>{details[0].cvv}</Col>
-                </Row>
-                <Row>
-                  <Col sm={3}></Col>
-                  <Col sm={3}></Col>
-                </Row>
-              </Container>              
-            </Accordion.Body>
-          </Accordion.Item>
-        );
-      })}
-    </Accordion>
-    */
     })}
     </div></div>
   )

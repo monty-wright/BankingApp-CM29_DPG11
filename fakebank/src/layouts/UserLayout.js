@@ -276,7 +276,7 @@ function UserLayout() {
     if(token && (decodedToken.exp * 1000 > dateNow.getTime()) && (decodedToken.preferred_username === 'ccaccountowner')) {
         authToken = true;
     } else {
-        authToken = true;
+        authToken = false;
     }
     return (
       authToken ? <><CustomNavbar /> <Outlet /></> : <Navigate to="/login"/>
