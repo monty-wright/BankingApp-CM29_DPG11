@@ -20,10 +20,10 @@ services:
     container_name: frontend
     build:
       dockerfile: Dockerfile
-      context: ./fakebank
+      context: ./ui
     volumes:
       - /app/node_modules
-      - ./fakebank:/app
+      - ./ui:/app
     ports:
       - 3050:3000
       
