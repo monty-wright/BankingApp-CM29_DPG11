@@ -37,39 +37,6 @@ $headers = @{
     Authorization="Bearer $jwt"
 }
 
-#Creating local CA
-<#
-Write-Output "Creating local CA..."
-$url = "https://$kms/api/v1/ca/local-cas"
-$body = @{
-    'name' = "local-CA-$counter"
-    'algorithm' = 'RSA'
-    'size' = 4096
-    'cn' = 'CM Root CA'
-    'emailAddresses' = @('contact@thalesgroup.com')
-    'names' = @(
-        @{
-            'O' = 'Thales'
-            'C' = 'US'
-            'ST' = 'TX'
-            'L' = 'Austin'
-        }
-    )
-}
-$jsonBody = $body | ConvertTo-Json -Depth 5
-$response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
-$caId = 'kylo:kylo:naboo:localca:12b0233e-d233-4856-bb8a-e22a8ff6e614'
-
-#Activate local CA
-Write-Output "Activating above CA..."
-$url = "https://$kms/api/v1/ca/local-cas/$caID/self-sign"
-$body = @{
-    'duration' = 365
-}
-$jsonBody = $body | ConvertTo-Json -Depth 5
-$response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
-#>
-
 #Fetching local root CA ID
 $url = "https://$kms/api/v1/ca/local-cas?subject=/C=US/ST=TX/L=Austin/O=Thales/CN=CipherTrust Root CA"
 $response = Invoke-RestMethod -Method 'Get' -Uri $url -Headers $headers -ContentType 'application/json'
@@ -265,12 +232,12 @@ $body = @{
             'api_url' = '/api/fakebank/accounts/{id}'            
             'json_response_get_tokens' = @(
                 @{
-                    'name' = 'ccCvv'
+                    'name' = 'accounts.[*].ccv'
                     'operation' = 'reveal'
                     'protection_policy' = "cvv_ProtectionPolicy-$counter"
                     'access_policy' = "cc_access_policy-$counter"
                 },@{
-                    'name' = 'ccNumber'
+                    'name' = 'accounts.[*].ccNumber'
                     'operation' = 'reveal'
                     'protection_policy' = "CC_ProtectionPolicy-$counter"
                     'access_policy' = "cc_access_policy-$counter"
