@@ -7,8 +7,8 @@ This project will let you
 ## Getting Started
 ### Prerequisites
 * On Windows
-- PowerShell >3
-- Docker Desktop
+  * PowerShell >3
+  * Docker Desktop
 ### Architecture
 ![image](https://user-images.githubusercontent.com/111074839/189827400-3377df49-b028-4f32-bca3-087ce61fb0c4.png)
 ### Quickstart
