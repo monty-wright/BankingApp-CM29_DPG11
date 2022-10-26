@@ -12,7 +12,7 @@ export default function Fetch() {
 
     useEffect(() => {
         axios
-          .get('http://{process.env.SERVER_IP}:8081/api/proxy/accounts/'+decodedToken.preferred_username+'/'+q)
+          .get('http://'+process.env.BACKEND_APP_HOST_IP_ADDRESS+':8081/api/proxy/accounts/'+decodedToken.preferred_username+'/'+q)
           .then((res) => {
             setAccounts(res.data.accounts);
           })

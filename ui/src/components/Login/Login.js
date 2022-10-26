@@ -6,7 +6,7 @@ import jwt_decode from "jwt-decode";
 
 async function loginUser(credentials) {
  console.log(credentials);
- return fetch('http://{process.env.SERVER_IP}:8080/api/fakebank/signin/', {
+ return fetch('http://'+process.env.BACKEND_APP_HOST_IP_ADDRESS+':8080/api/fakebank/signin/', {
    method: 'POST',
    headers: {
      'Content-Type': 'application/json'

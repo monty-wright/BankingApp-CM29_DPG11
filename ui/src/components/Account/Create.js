@@ -3,7 +3,7 @@ import jwt_decode from "jwt-decode";
 
 async function createAccount(AccDetails) {
     console.log(JSON.stringify(AccDetails))
-    return fetch('http://{process.env.SERVER_IP}:8081/api/proxy/account', {
+    return fetch('http://'+process.env.BACKEND_APP_HOST_IP_ADDRESS+':8081/api/proxy/account', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

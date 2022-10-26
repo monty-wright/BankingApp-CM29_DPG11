@@ -17,12 +17,12 @@ services:
       
   frontend:
     stdin_open: true
-    environment:
-      - SERVER_IP=localhost
     container_name: frontend
     build:
       dockerfile: Dockerfile
       context: ./ui
+      args:
+        - BACKEND_APP_HOST_IP_ADDRESS=localhost
     volumes:
       - /app/node_modules
       - ./ui:/app
