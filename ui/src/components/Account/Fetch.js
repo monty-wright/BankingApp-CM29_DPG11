@@ -12,13 +12,11 @@ export default function Fetch() {
 
     useEffect(() => {
         axios
-          .get('http://localhost:8081/api/proxy/accounts/'+decodedToken.preferred_username+'/'+q)
+          .get('http://{process.env.SERVER_IP}:8081/api/proxy/accounts/'+decodedToken.preferred_username+'/'+q)
           .then((res) => {
             setAccounts(res.data.accounts);
           })
           .catch((err) => console.log(err));
-          //data = {"userName":"ccaccountowner","accounts":[{"expDate":"12/04/2025","ccNumber":"2000101000100730-2184-1768-3759","cvv":"373","friendlyName":"Walmart MC","balance":"0"},{"expDate":"12/04/2025","ccNumber":"2000101000100730-2184-1768-3759","cvv":"373","friendlyName":"Costco MC","balance":"0"}]}
-          //setAccounts(data.accounts);
       }, []);  
       const cards = {};
       for (const account of accounts) {

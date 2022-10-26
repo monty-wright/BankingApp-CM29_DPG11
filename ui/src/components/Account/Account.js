@@ -11,7 +11,7 @@ function Account() {
   useEffect(() => {
     console.log(decodedToken.preferred_username);
     axios
-      .get('http://localhost:8081/api/proxy/accounts/'+decodedToken.preferred_username+'/'+ decodedToken.preferred_username)
+      .get('http://{process.env.SERVER_IP}:8081/api/proxy/accounts/'+decodedToken.preferred_username+'/'+ decodedToken.preferred_username)
       .then((res) => {
         setAccounts(res.data.accounts);
       })

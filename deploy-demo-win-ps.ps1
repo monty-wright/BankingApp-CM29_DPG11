@@ -37,6 +37,25 @@ $headers = @{
     Authorization="Bearer $jwt"
 }
 
+#Create DPG Key
+Write-Output "Creating DPG Key"
+$url = "https://$kms/api/v1/vault/keys2"
+$body = @{
+    'name' = "dpgKey-$counter"
+    'usageMask' = 3145740
+    'algorithm' = 'aes'
+    'size' = 256
+    'unexportable' = $false
+    'undeletable' = $false
+    'meta' = @{
+        'ownerId' = 'local|312c1485-aa03-454c-8591-6bd41509d846'
+        'versionedKey' = $true
+    }
+}
+$jsonBody = $body | ConvertTo-Json -Depth 5
+$response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+$keyID = $response.id
+
 #Fetching local root CA ID
 $url = "https://$kms/api/v1/ca/local-cas?subject=/C=US/ST=TX/L=Austin/O=Thales/CN=CipherTrust Root CA"
 $response = Invoke-RestMethod -Method 'Get' -Uri $url -Headers $headers -ContentType 'application/json'
@@ -79,7 +98,7 @@ Write-Output "Creating Protection Policy for CVV Number..."
 $url = "https://$kms/api/v1/data-protection/protection-policies"
 $body = @{
     'name' = "cvv_ProtectionPolicy-$counter"
-    'key' = 'dpgKey'
+    'key' = "dpgKey-$counter"
     'tweak' = '1628462495815733'
     'tweak_algorithm' = 'SHA1'
     'algorithm' = 'FPE/FF1v2/UNICODE'
@@ -95,7 +114,7 @@ Write-Output "Creating Protection Policy for Credit Card Number..."
 $url = "https://$kms/api/v1/data-protection/protection-policies"
 $body = @{
     'name' = "CC_ProtectionPolicy-$counter"
-    'key' = 'dpgKey'
+    'key' = "dpgKey-$counter"
     'tweak' = '9828462495846783'
     'tweak_algorithm' = 'SHA1'
     'algorithm' = 'FPE/AES/CARD10'
@@ -110,7 +129,7 @@ Write-Output "Creating Protection Policy for SSN..."
 $url = "https://$kms/api/v1/data-protection/protection-policies"
 $body = @{
     'name' = "SSN_ProtectionPolicy-$counter"
-    'key' = 'dpgKey'
+    'key' = "dpgKey-$counter"
     'tweak' = '1628462495815733'
     'tweak_algorithm' = 'SHA1'
     'algorithm' = 'FPE/FF1v2/UNICODE'
@@ -348,6 +367,10 @@ $yamlObj.services.ciphertrust.environment = @(
     "KMS=$kms",
     "DPG_PORT=9005"
 )
+$yamlObj.services.api.environment = @(
+    "CMIP=$kms"
+)
+
 $yaml = ConvertTo-YAML $yamlObj | .\yq.exe
 Set-Content -Path ".\docker-compose.yml" -Value $yaml
 
