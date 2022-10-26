@@ -368,7 +368,7 @@ $yamlObj.services.ciphertrust.environment = @(
     "DPG_PORT=9005"
 )
 $yamlObj.services.api.environment = @(
-    "CMIP=$kms"
+    "CMIP=https://$kms"
 )
 
 $yaml = ConvertTo-YAML $yamlObj | .\yq.exe
