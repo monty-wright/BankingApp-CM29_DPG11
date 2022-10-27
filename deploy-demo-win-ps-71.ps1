@@ -3,20 +3,6 @@ $password = "ChangeIt!"
 $kms = "1.1.1.1"
 $counter = "demo"
 
-#Some house keeping stuff
-add-type @"
-    using System.Net;
-    using System.Security.Cryptography.X509Certificates;
-    public class TrustAllCertsPolicy : ICertificatePolicy {
-        public bool CheckValidationResult(
-            ServicePoint srvPoint, X509Certificate certificate,
-            WebRequest request, int certificateProblem) {
-            return true;
-        }
-    }
-"@
-[System.Net.ServicePointManager]::CertificatePolicy = New-Object TrustAllCertsPolicy
-
 Write-Output "-----------------------------------------------------------------"
 Write-Output "Next few steps will create boilerplate config on your CM instance"
 Write-Output "-----------------------------------------------------------------"
@@ -29,7 +15,7 @@ $Body = @{
     username = $username
     password = $password
 }
-$response = Invoke-RestMethod -Method 'Post' -Uri $Url -Body $body
+$response = Invoke-RestMethod -SkipCertificateCheck -Method 'Post' -Uri $Url -Body $body
 $jwt = $response.jwt
 
 #Generic header for next set of API calls
@@ -53,12 +39,12 @@ $body = @{
     }
 }
 $jsonBody = $body | ConvertTo-Json -Depth 5
-$response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+$response = Invoke-RestMethod -SkipCertificateCheck -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
 $keyID = $response.id
 
 #Fetching local root CA ID
 $url = "https://$kms/api/v1/ca/local-cas?subject=/C=US/ST=TX/L=Austin/O=Thales/CN=CipherTrust Root CA"
-$response = Invoke-RestMethod -Method 'Get' -Uri $url -Headers $headers -ContentType 'application/json'
+$response = Invoke-RestMethod -SkipCertificateCheck -Method 'Get' -Uri $url -Headers $headers -ContentType 'application/json'
 $caID = $response.resources[0].uri
 
 #Creating network interface NAE
@@ -78,7 +64,7 @@ $body = @{
     'network_interface' = 'all'
 }
 $jsonBody = $body | ConvertTo-Json -Depth 5
-$response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+$response = Invoke-RestMethod -SkipCertificateCheck -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
 
 #Creating Character Set
 Write-Output "Creating Character Set..."
@@ -90,7 +76,7 @@ $body = @{
     'encoding' = 'UTF-8'
 }
 $jsonBody = $body | ConvertTo-Json -Depth 5
-$response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+$response = Invoke-RestMethod -SkipCertificateCheck -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
 $charSetId = $response.id
 
 #Creating CVV Protection Policy
@@ -106,7 +92,7 @@ $body = @{
     'allow_single_char_input' = $false
 }
 $jsonBody = $body | ConvertTo-Json -Depth 5
-$response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+$response = Invoke-RestMethod -SkipCertificateCheck -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
 $cvvPolicyId = $response.id
 
 #Creating CC Number Protection Policy
@@ -121,7 +107,7 @@ $body = @{
     'allow_single_char_input' = $false
 }
 $jsonBody = $body | ConvertTo-Json -Depth 5
-$response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+$response = Invoke-RestMethod -SkipCertificateCheck -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
 $ccPolicyId = $response.id
 
 #Creating SSN Protection Policy
@@ -137,7 +123,7 @@ $body = @{
     'allow_single_char_input' = $false
 }
 $jsonBody = $body | ConvertTo-Json -Depth 5
-$response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+$response = Invoke-RestMethod -SkipCertificateCheck -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
 $ssnPolicyId = $response.id
 
 #Creating User Sets
@@ -149,7 +135,7 @@ $body = @{
     'users' = @('ccaccountowner')
 }
 $jsonBody = $body | ConvertTo-Json -Depth 5
-$response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+$response = Invoke-RestMethod -SkipCertificateCheck -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
 $plainTextUserSetId = $response.id
 
 Write-Output "Creating Masked Data User Set..."
@@ -160,7 +146,7 @@ $body = @{
     'users' = @('cccustomersupport')
 }
 $jsonBody = $body | ConvertTo-Json -Depth 5
-$response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+$response = Invoke-RestMethod -SkipCertificateCheck -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
 $maskedTextUserSetId = $response.id
 
 Write-Output "Creating Encrypted Data User Set..."
@@ -171,7 +157,7 @@ $body = @{
     'users' = @('everyoneelse')
 }
 $jsonBody = $body | ConvertTo-Json -Depth 5
-$response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+$response = Invoke-RestMethod -SkipCertificateCheck -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
 $encTextUserSetId = $response.id
 
 #Creating masking policy
@@ -185,7 +171,7 @@ $body = @{
     'mask_char' = 'x'
 }
 $jsonBody = $body | ConvertTo-Json -Depth 5
-$response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+$response = Invoke-RestMethod -SkipCertificateCheck -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
 $maskingPolicyId = $response.id
 
 #Creating Access Policies
@@ -213,7 +199,7 @@ $body = @{
     )
 }
 $jsonBody = $body | ConvertTo-Json -Depth 5
-$response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+$response = Invoke-RestMethod -SkipCertificateCheck -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
 $accessPolicyId = $response.id
 
 #This is the interesting step...defining DPG policies for the API endpoints
@@ -276,7 +262,7 @@ $body = @{
     )
 }
 $jsonBody = $body | ConvertTo-Json -Depth 5
-$response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+$response = Invoke-RestMethod -SkipCertificateCheck -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
 $dpgPolicyId = $response.id
 
 #Final setup...creating client application
@@ -314,7 +300,7 @@ $body = @{
     }
 }
 $jsonBody = $body | ConvertTo-Json -Depth 5
-$response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+$response = Invoke-RestMethod -SkipCertificateCheck -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
 $regToken = $response.reg_token
 
 #ohhh...this one is the final step...adding few users
@@ -330,7 +316,7 @@ $body = @{
     'user_metadata' = @{}
 }
 $jsonBody = $body | ConvertTo-Json -Depth 5
-Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+Invoke-RestMethod -SkipCertificateCheck -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
 
 $url = "https://$kms/api/v1/usermgmt/users"
 $body = @{
@@ -342,7 +328,7 @@ $body = @{
     'user_metadata' = @{}
 }
 $jsonBody = $body | ConvertTo-Json -Depth 5
-Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+Invoke-RestMethod -SkipCertificateCheck -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
 
 $url = "https://$kms/api/v1/usermgmt/users"
 $body = @{
@@ -354,7 +340,7 @@ $body = @{
     'user_metadata' = @{}
 }
 $jsonBody = $body | ConvertTo-Json -Depth 5
-Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+Invoke-RestMethod -SkipCertificateCheck -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
 
 [string[]]$fileContent = Get-Content ".\docker-compose-template.yml"
 $content = ''
