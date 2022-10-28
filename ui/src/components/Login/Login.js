@@ -29,14 +29,14 @@ export default function Login() {
       password
     });
     sessionStorage.setItem('token',auth_response.jwt);
-    //sessionStorage.setItem('token',"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJjZGNkMTMyYy1iZWQzLTRjMDQtYWEzMS03Zjk1MzkxMTMyNzYiLCJzdWIiOiJsb2NhbHwyNzIxZGM4MC02NjZjLTQ3NGQtYjNkNS00MDUxZDc0NjQ1MzEiLCJpc3MiOiJreWxvIiwiYWNjIjoia3lsbyIsInByZWZlcnJlZF91c2VybmFtZSI6ImNjYWNjb3VudG93bmVyIiwiY3VzdCI6eyJkb21haW5faWQiOiIwMDAwMDAwMC0wMDAwLTAwMDAtMDAwMC0wMDAwMDAwMDAwMDAiLCJzaWQiOiIwZTY3ZDQ3NS0yMzEzLTQxNjEtOTc3MS01NWFhMTYyMWJlYWQiLCJ6b25lX2lkIjoiMDAwMDAwMDAtMDAwMC0wMDAwLTAwMDAtMDAwMDAwMDAwMDAwIn0sImp3dGlkIjoiYzQxNzIwZDctMjQ5My00MzJiLWE5N2UtN2VmNWIxMGI5NTc1IiwiaWF0IjoxNjY0OTAyMDY2LCJleHAiOjE2NjQ5MDIzNjZ9.-MG-NkC86V9eSo0K5Gs0ZtRdSIIk1itRBytgOlFyfHk");
-    //sessionStorage.setItem('token', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJjZGNkMTMyYy1iZWQzLTRjMDQtYWEzMS03Zjk1MzkxMTMyNzYiLCJzdWIiOiJsb2NhbHwzZWVjY2ZkNC05NmYzLTRjNTQtYjgzYy1hOTYwNDA3NjEyNTEiLCJpc3MiOiJreWxvIiwiYWNjIjoia3lsbyIsInByZWZlcnJlZF91c2VybmFtZSI6ImNjY3VzdG9tZXJzdXBwb3J0IiwiY3VzdCI6eyJkb21haW5faWQiOiIwMDAwMDAwMC0wMDAwLTAwMDAtMDAwMC0wMDAwMDAwMDAwMDAiLCJzaWQiOiJjOWViMzFlNS00YTgyLTQ4NTctOWU5My1jZDBmNDM3NTZjYTAiLCJ6b25lX2lkIjoiMDAwMDAwMDAtMDAwMC0wMDAwLTAwMDAtMDAwMDAwMDAwMDAwIn0sImp3dGlkIjoiZjFjYmQ5Y2UtNTczOS00YmI5LWFjYmYtYThmNzNkZDVjZmE1IiwiaWF0IjoxNjY0OTEwMjQyLCJleHAiOjE2NjQ5MTA1NDJ9.qBRbgPUlU8Z7C93SX8TvULvefZmm-IxeIhkYm5u_guU')
     let token = sessionStorage.getItem('token');
     var decodedToken = jwt_decode(token);
     
     if(decodedToken.preferred_username === 'ccaccountowner')
       navigate('/auth/user/home');
     else if(decodedToken.preferred_username === 'cccustomersupport')
+      navigate('/auth/admin/home');
+    else if(decodedToken.preferred_username === 'everyoneelse')
       navigate('/auth/admin/home');
     else
         navigate('/login');

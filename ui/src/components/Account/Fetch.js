@@ -1,18 +1,23 @@
 import { React, useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import jwt_decode from "jwt-decode";
 
 export default function Fetch() {
     const { state } = useLocation();
-    const { q } = state;
     const [accounts, setAccounts] = useState("");
+    const [searchParams, setSearchParams] = useSearchParams();
     let token = sessionStorage.getItem('token');
     var decodedToken = jwt_decode(token);
 
     useEffect(() => {
         axios
-          .get('http://'+process.env.REACT_APP_BACKEND_IP_ADDRESS+':8081/api/proxy/accounts/'+decodedToken.preferred_username+'/'+q)
+          .get('http://'+
+            process.env.REACT_APP_BACKEND_IP_ADDRESS+
+            ':8081/api/proxy/accounts/'+
+            decodedToken.preferred_username+
+            '/'+
+            searchParams.get("user"))
           .then((res) => {
             setAccounts(res.data.accounts);
           })
@@ -44,7 +49,9 @@ export default function Fetch() {
                   <div className="w-full flex items-center justify-center">
                       <div className="flex flex-col items-center">
                           <img src="https://cdn.tuk.dev/assets/webapp/master_layouts/boxed_layout/boxed_layout2.jpg" alt="profile" />
-                          <p className="mt-2 text-xs sm:text-sm md:text-base font-semibold text-center text-white">{decodedToken.preferred_username}</p>
+                          <p className="mt-2 text-xs sm:text-sm md:text-base font-semibold text-center text-white">
+                            {atob(searchParams.get("meta"))}
+                          </p>
                       </div>
                   </div>
                   <div className="flex items-center mt-7">

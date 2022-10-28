@@ -10,6 +10,7 @@ import Login from './components/Login/Login';
 import UserLayout from './layouts/UserLayout';
 import AdminLayout from './layouts/AdminLayout';
 import Logout from './components/Login/Logout';
+import List from './components/Account/List';
 
 function App() {
   return (
@@ -26,7 +27,8 @@ function App() {
           </Route>
           <Route path="/auth/admin" element={<AdminLayout />}>
             <Route exact path="home" element={<Dashboard />} />
-            <Route path="listAccounts" element={<Fetch />} />
+            <Route path="listAccounts" element={<List />} />
+            <Route path="fetch" element={<Fetch />} />
           </Route>
         </Routes>
       </BrowserRouter>
