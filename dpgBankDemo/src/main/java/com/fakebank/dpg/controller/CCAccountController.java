@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fakebank.dpg.bean.CustomerAccountBean;
 import com.fakebank.dpg.bean.CustomerCreditAccounts;
+import com.fakebank.dpg.bean.CustomerPersonalAccounts;
 import com.fakebank.dpg.bean.CustomerPersonalDetails;
 import com.fakebank.dpg.model.CustomerAccountCard;
 import com.fakebank.dpg.model.CustomerAccountMongoDocumentBean;
@@ -102,13 +103,16 @@ public class CCAccountController {
 	
 	@CrossOrigin(origins = "*")
 	@GetMapping("/api/fakebank/account/holders")
-	public ArrayList<String> getAccountHolders() {
+	public CustomerPersonalAccounts getAccountHolders() {
 		List<CustomerAccountMongoDocumentBean> accounts = mongoCustomerAccountRepo.findAll();
-		ArrayList<String> users = new ArrayList<String>();
+		CustomerPersonalAccounts res = new CustomerPersonalAccounts();
 		for (int i = 0; i < accounts.size(); i++) {
-			users.add(accounts.get(i).getUserName());
+			CustomerPersonalDetails cust = new CustomerPersonalDetails();
+			cust.setUserName(accounts.get(i).getUserName());
+			cust.setDetails(accounts.get(i).getDetails());
+			res.getAccounts().add(cust);
 		}
-		return users;
+		return res;
 	}
 	
 	@CrossOrigin(origins = "*")

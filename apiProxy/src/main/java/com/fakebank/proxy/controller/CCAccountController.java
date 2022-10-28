@@ -28,6 +28,7 @@ import org.springframework.web.client.RestTemplate;
 import com.fakebank.proxy.bean.AccountCreateRequestBean;
 import com.fakebank.proxy.bean.CustomerAccountBean;
 import com.fakebank.proxy.bean.CustomerCreditAccounts;
+import com.fakebank.proxy.bean.CustomerPersonalAccounts;
 
 
 /**
@@ -96,7 +97,7 @@ public class CCAccountController {
 	
 	@CrossOrigin(origins = "*")
 	@GetMapping("/api/proxy/accounts/all/{requestor}")
-	public ArrayList<String> getAllAccountHolders(@PathVariable("requestor") String requestor) {
+	public CustomerPersonalAccounts getAllAccountHolders(@PathVariable("requestor") String requestor) {
 		String dockerUri = "http://ciphertrust:9005/api/fakebank/account/holders";
 		
 		String plainCreds = requestor + ":KeySecure01!";
@@ -107,11 +108,11 @@ public class CCAccountController {
 		headers.add("Authorization", "Basic " + base64Creds);
 		HttpEntity<String> request = new HttpEntity<String>(headers);
 		
-		ResponseEntity<ArrayList> fetchResponse = restTemplate.exchange(
+		ResponseEntity<CustomerPersonalAccounts> fetchResponse = restTemplate.exchange(
 				dockerUri, 
 				HttpMethod.GET, 
 				request, 
-				ArrayList.class);
+				CustomerPersonalAccounts.class);
 		return fetchResponse.getBody();
 	}
 }
