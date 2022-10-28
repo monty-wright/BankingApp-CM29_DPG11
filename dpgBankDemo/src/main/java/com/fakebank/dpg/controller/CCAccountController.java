@@ -105,13 +105,15 @@ public class CCAccountController {
 	@GetMapping("/api/fakebank/account/holders")
 	public CustomerPersonalAccounts getAccountHolders() {
 		List<CustomerAccountMongoDocumentBean> accounts = mongoCustomerAccountRepo.findAll();
+		ArrayList<CustomerPersonalDetails> list = new ArrayList<CustomerPersonalDetails>();
 		CustomerPersonalAccounts res = new CustomerPersonalAccounts();
 		for (int i = 0; i < accounts.size(); i++) {
 			CustomerPersonalDetails cust = new CustomerPersonalDetails();
 			cust.setUserName(accounts.get(i).getUserName());
 			cust.setDetails(accounts.get(i).getDetails());
-			res.getAccounts().add(cust);
+			list.add(cust);
 		}
+		res.setAccounts(list);
 		return res;
 	}
 	
