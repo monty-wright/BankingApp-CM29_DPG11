@@ -87,22 +87,6 @@ public class CCAccountController {
 			
 			mongoCustomerAccountRepo.save(accountBody);
 		}
-		
-		
-		/*CustomerAccount newAccount = new CustomerAccount();
-		
-		newAccount.setAccountBalance(0);
-		newAccount.setCcCvv(bean.getCcCvv());
-		newAccount.setCcNumber(bean.getCcNumber());
-		newAccount.setCcExpiry(bean.getCcExpiry());
-		newAccount.setFullName(bean.getFullName());
-		newAccount.setDob(bean.getDob());
-		newAccount.setSsn(bean.getSsn());
-		newAccount.setMobileNumber(bean.getMobileNumber());
-		newAccount.setUserName(bean.getUserName());
-		newAccount.setCustomerCmId(bean.getIntCmId());
-		
-		CustomerAccount createdAccount = accountRepository.createAccount(newAccount);*/
 		return "new credit account added succesfully";
 	}
 	
@@ -114,6 +98,17 @@ public class CCAccountController {
 		res.setUserName(acc.get().getUserName());
 		res.setAccounts(acc.get().getCards());
 		return res;
+	}
+	
+	@CrossOrigin(origins = "*")
+	@GetMapping("/api/fakebank/account/holders")
+	public ArrayList<String> getAccountHolders() {
+		List<CustomerAccountMongoDocumentBean> accounts = mongoCustomerAccountRepo.findAll();
+		ArrayList<String> users = new ArrayList<String>();
+		for (int i = 0; i < accounts.size(); i++) {
+			users.add(accounts.get(i).getUserName());
+		}
+		return users;
 	}
 	
 	@CrossOrigin(origins = "*")

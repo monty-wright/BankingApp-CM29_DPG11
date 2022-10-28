@@ -5,6 +5,7 @@ package com.fakebank.proxy.controller;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Calendar;
 import java.util.concurrent.ThreadLocalRandom;
@@ -89,7 +90,28 @@ public class CCAccountController {
 		headers.add("Authorization", "Basic " + base64Creds);
 		HttpEntity<String> request = new HttpEntity<String>(headers);
 		
-		ResponseEntity<CustomerCreditAccounts> createResponse = restTemplate.exchange(dockerUri, HttpMethod.GET, request, CustomerCreditAccounts.class);
-		return createResponse.getBody();
+		ResponseEntity<CustomerCreditAccounts> fetchResponse = restTemplate.exchange(dockerUri, HttpMethod.GET, request, CustomerCreditAccounts.class);
+		return fetchResponse.getBody();
+	}
+	
+	@CrossOrigin(origins = "*")
+	@GetMapping("/api/proxy/accounts/all/{requestor}")
+	public ArrayList<String> getAllAccountHolders(@PathVariable("requestor") String requestor) {
+		String dockerUri = "http://ciphertrust:9005/api/fakebank/account/holders";
+		
+		String plainCreds = requestor + ":KeySecure01!";
+		byte[] plainCredsBytes = plainCreds.getBytes();
+		byte[] base64CredsBytes = Base64.getEncoder().encode(plainCredsBytes);
+		String base64Creds = new String(base64CredsBytes);
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Authorization", "Basic " + base64Creds);
+		HttpEntity<String> request = new HttpEntity<String>(headers);
+		
+		ResponseEntity<ArrayList> fetchResponse = restTemplate.exchange(
+				dockerUri, 
+				HttpMethod.GET, 
+				request, 
+				ArrayList.class);
+		return fetchResponse.getBody();
 	}
 }
