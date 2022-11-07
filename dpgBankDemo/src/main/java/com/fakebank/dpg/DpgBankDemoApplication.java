@@ -21,7 +21,10 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+
 @SpringBootApplication
+@OpenAPIDefinition
 @ComponentScans({@ComponentScan("com.fakebank.dpg.controller")})
 @EnableJpaRepositories("com.fakebank.dpg.repository")
 @EntityScan("com.fakebank.dpg.model")
