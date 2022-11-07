@@ -51,15 +51,13 @@ public class CCAccountController {
 			newCardDetails.setFriendlyName(bean.getFriendlyName());
 			newCardDetails.setExpDate(bean.getExpDate());
 			newCardDetails.setBalance("0");
-			List<CustomerAccountCard> cards;
-			if(user.getCards() == null) {
-				cards = new ArrayList<CustomerAccountCard>();
-			}
-			cards = user.getCards();
-			
+			List<CustomerAccountCard> cards = new ArrayList<CustomerAccountCard>();
+			System.out.println(user.toString());
+			if(user.getCards().size() > 0) {
+				cards = user.getCards();
+			}			
 			cards.add(newCardDetails);
-			user.setCards(cards);
-			
+			user.setCards(cards);			
 			mongoCustomerAccountRepo.save(user);
 		}
 		else {

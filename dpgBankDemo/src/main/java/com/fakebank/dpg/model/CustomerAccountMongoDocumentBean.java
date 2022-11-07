@@ -52,4 +52,10 @@ public class CustomerAccountMongoDocumentBean {
 	public void setDetails(CustomerAccountPersonal details) {
 		this.details = details;
 	}
+
+	@Override
+	public String toString() {
+		return "CustomerAccountMongoDocumentBean [userName=" + userName + ", creationDate=" + creationDate + ", cards="
+				+ cards + ", details=" + details + "]";
+	}
 }
