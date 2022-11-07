@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fakebank.dpg.bean.ApiResponseBean;
 import com.fakebank.dpg.bean.CustomerCreditAccounts;
 import com.fakebank.dpg.bean.CustomerPersonalAccounts;
 import com.fakebank.dpg.bean.CustomerPersonalDetails;
@@ -38,8 +39,9 @@ public class CCAccountController {
 	
 	@CrossOrigin(origins = "*")
 	@PostMapping("/api/fakebank/account/card")
-	public String saveCreditAccount(@RequestBody NewCreditCardBean bean) {
+	public ApiResponseBean saveCreditAccount(@RequestBody NewCreditCardBean bean) {
 		//MongoDb: Add the customer details to the DB
+		ApiResponseBean response = new ApiResponseBean();
 		Optional<CustomerAccountMongoDocumentBean> existingUser = mongoCustomerAccountRepo.findById(bean.getUserName());
 		if(existingUser.isPresent()) {
 			CustomerAccountMongoDocumentBean user = existingUser.get();
@@ -49,34 +51,32 @@ public class CCAccountController {
 			newCardDetails.setFriendlyName(bean.getFriendlyName());
 			newCardDetails.setExpDate(bean.getExpDate());
 			newCardDetails.setBalance("0");
-			List<CustomerAccountCard> cards = user.getCards();
+			List<CustomerAccountCard> cards;
+			if(user.getCards() == null) {
+				cards = new ArrayList<CustomerAccountCard>();
+			}
+			cards = user.getCards();
+			
 			cards.add(newCardDetails);
 			user.setCards(cards);
 			
 			mongoCustomerAccountRepo.save(user);
 		}
 		else {
-			CustomerAccountMongoDocumentBean accountBody = new CustomerAccountMongoDocumentBean();
-			accountBody.setUserName(bean.getUserName());
-			CustomerAccountCard newCardDetails = new CustomerAccountCard();
-			newCardDetails.setCcNumber(bean.getCcNumber());
-			newCardDetails.setCvv(bean.getCvv());
-			newCardDetails.setFriendlyName(bean.getFriendlyName());
-			newCardDetails.setExpDate(bean.getExpDate());
-			newCardDetails.setBalance("0");
-			List<CustomerAccountCard> cards = new ArrayList<CustomerAccountCard>();
-			cards.add(newCardDetails);
-			accountBody.setCards(cards);
-			
-			mongoCustomerAccountRepo.save(accountBody);
+			response.setStatus("Failed");
+			response.setMessage("User does not exists");
+			return response;
 		}
-		return "new credit account added succesfully";
+		response.setStatus("Success");
+		response.setMessage("new credit account added succesfully");
+		return response;
 	}
 	
 	@CrossOrigin(origins = "*")
 	@PostMapping("/api/fakebank/account/personal")
-	public String saveAccountDetails(@RequestBody CustomerPersonalDetails bean) {
+	public ApiResponseBean saveAccountDetails(@RequestBody CustomerPersonalDetails bean) {
 		//MongoDb: Add the customer details to the DB
+		ApiResponseBean response = new ApiResponseBean();
 		Optional<CustomerAccountMongoDocumentBean> existingUser = mongoCustomerAccountRepo.findById(bean.getUserName());
 		if(existingUser.isPresent()) {
 			CustomerAccountMongoDocumentBean user = existingUser.get();
@@ -93,7 +93,9 @@ public class CCAccountController {
 			
 			mongoCustomerAccountRepo.save(accountBody);
 		}
-		return "user details added succesfully";
+		response.setStatus("Success");
+		response.setMessage("user details added succesfully");
+		return response;
 	}
 	
 	@CrossOrigin(origins = "*")

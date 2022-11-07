@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import com.fakebank.proxy.bean.AccountDetailsUpdateRequestBean;
+import com.fakebank.proxy.bean.ApiResponseBean;
 import com.fakebank.proxy.bean.CustomerAccountPersonal;
 import com.fakebank.proxy.bean.CustomerCreditAccounts;
 import com.fakebank.proxy.bean.CustomerPersonalAccounts;
@@ -46,7 +47,7 @@ public class CCAccountController {
 	@CrossOrigin(origins = "*")
 	@PostMapping(value = "/api/proxy/account/details", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
-	public String saveAccountDetails(@RequestBody AccountDetailsUpdateRequestBean bean) {
+	public ApiResponseBean saveAccountDetails(@RequestBody AccountDetailsUpdateRequestBean bean) {
 		CustomerPersonalDetails acc = new CustomerPersonalDetails();
 		CustomerAccountPersonal personalDetails = new CustomerAccountPersonal();
 		
@@ -60,7 +61,7 @@ public class CCAccountController {
 		acc.setDetails(personalDetails);
 		
 		String dockerUri = "http://ciphertrust:9005/api/fakebank/account/personal";
-		String createResponse = restTemplate.postForObject(dockerUri, acc, String.class);
+		ApiResponseBean createResponse = restTemplate.postForObject(dockerUri, acc, ApiResponseBean.class);
 		
 		return createResponse;
 	}
@@ -69,7 +70,7 @@ public class CCAccountController {
 	@CrossOrigin(origins = "*")
 	@PostMapping(value = "/api/proxy/account/card", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
-	public String saveNewCard(@RequestBody NewCardRequestBean bean) {
+	public ApiResponseBean saveNewCard(@RequestBody NewCardRequestBean bean) {
 		NewCreditCardBean newCard = new NewCreditCardBean();
 		int cvv = ThreadLocalRandom.current().nextInt(100, 999);
 		String ccNumber = String.valueOf(ThreadLocalRandom.current().nextInt(1000, 9999)) + "-"
@@ -91,7 +92,7 @@ public class CCAccountController {
 		newCard.setUserName(bean.getUserName());
 		
 		String dockerUri = "http://ciphertrust:9005/api/fakebank/account/card";
-		String createResponse = restTemplate.postForObject(dockerUri, newCard, String.class);
+		ApiResponseBean createResponse = restTemplate.postForObject(dockerUri, newCard, ApiResponseBean.class);
 		
 		return createResponse;
 	}
