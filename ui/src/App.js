@@ -28,8 +28,7 @@ function App() {
             <Route path="createAccount" element={<CreateAccount />} />
           </Route>
           <Route path="/auth/admin" element={<AdminLayout />}>
-            <Route exact path="home" element={<Dashboard />} />
-            <Route path="listAccounts" element={<List />} />
+            <Route exact path="home" element={<List />} />
             <Route path="fetch" element={<Fetch />} />
           </Route>
         </Routes>
