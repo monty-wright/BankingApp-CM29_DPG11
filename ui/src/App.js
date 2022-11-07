@@ -1,8 +1,7 @@
 import './App.css';
-import {React, useState} from 'react';
+import {React} from 'react';
 import Dashboard from './components/Dashboard/Dashboard';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Statement from './components/Statement/Statement';
 import Account from './components/Account/Account';
 import CreateAccount from './components/Account/Create';
 import Fetch from './components/Account/Fetch';
@@ -11,6 +10,8 @@ import UserLayout from './layouts/UserLayout';
 import AdminLayout from './layouts/AdminLayout';
 import Logout from './components/Login/Logout';
 import List from './components/Account/List';
+import My from './components/Account/My';
+import UserDashboard from './components/Dashboard/UserDashboard';
 
 function App() {
   return (
@@ -21,7 +22,8 @@ function App() {
           <Route path='/login' element={<Login />} />
           <Route path='/logout' element={<Logout />} />
           <Route path="/auth/user" element={<UserLayout />}>
-            <Route exact path="home" element={<Dashboard />} />
+            <Route exact path="home" element={<UserDashboard />} />
+            <Route path="myAccount" element={<My />} />
             <Route path="accounts" element={<Account />} />
             <Route path="createAccount" element={<CreateAccount />} />
           </Route>

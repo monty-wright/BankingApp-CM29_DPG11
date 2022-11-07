@@ -224,18 +224,8 @@ $body = @{
     'description' = 'DPG policy for credit card attributes'
     'proxy_config' = @(
         @{
-            'api_url' = '/api/fakebank/account'
+            'api_url' = '/api/fakebank/account/personal'
             'json_request_post_tokens' = @(
-                @{
-                    'name' = 'ccNumber'
-                    'operation' = 'protect'
-                    'protection_policy' = "CC_ProtectionPolicy-$counter"
-                },
-                @{
-                    'name' = 'cvv'
-                    'operation' = 'protect'
-                    'protection_policy' = "cvv_ProtectionPolicy-$counter"
-                },
                 @{
                     'name' = 'ssn'
                     'operation' = 'protect'
@@ -248,10 +238,25 @@ $body = @{
             )
         },
         @{
-            'api_url' = '/api/fakebank/accounts/{id}'            
+            'api_url' = '/api/fakebank/account/card'
+            'json_request_post_tokens' = @(
+                @{
+                    'name' = 'ccNumber'
+                    'operation' = 'protect'
+                    'protection_policy' = "CC_ProtectionPolicy-$counter"
+                },
+                @{
+                    'name' = 'cvv'
+                    'operation' = 'protect'
+                    'protection_policy' = "cvv_ProtectionPolicy-$counter"
+                }
+            )
+        },
+        @{
+            'api_url' = '/api/fakebank/accounts/{id}'
             'json_response_get_tokens' = @(
                 @{
-                    'name' = 'accounts.[*].ccv'
+                    'name' = 'accounts.[*].cvv'
                     'operation' = 'reveal'
                     'protection_policy' = "cvv_ProtectionPolicy-$counter"
                     'access_policy' = "cc_access_policy-$counter"
@@ -260,15 +265,21 @@ $body = @{
                     'operation' = 'reveal'
                     'protection_policy' = "CC_ProtectionPolicy-$counter"
                     'access_policy' = "cc_access_policy-$counter"
-                },@{
-                    'name' = 'ssn'
+                }
+            )
+        },
+        @{
+            'api_url' = '/api/fakebank/details/{id}'
+            'json_response_get_tokens' = @(
+                @{
+                    'name' = 'details.ssn'
                     'operation' = 'reveal'
-                    'protection_policy' = "SSN_ProtectionPolicy-$counter"
+                    'protection_policy' = "cvv_ProtectionPolicy-$counter"
                     'access_policy' = "cc_access_policy-$counter"
                 },@{
-                    'name' = 'dob'
+                    'name' = 'details.dob'
                     'operation' = 'reveal'
-                    'protection_policy' = "SSN_ProtectionPolicy-$counter"
+                    'protection_policy' = "CC_ProtectionPolicy-$counter"
                     'access_policy' = "cc_access_policy-$counter"
                 }
             )

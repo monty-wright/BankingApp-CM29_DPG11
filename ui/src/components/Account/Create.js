@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import jwt_decode from "jwt-decode";
+import { useNavigate } from "react-router-dom";
 
 async function createAccount(AccDetails) {
-    console.log(JSON.stringify(AccDetails))
-    return fetch('http://'+process.env.REACT_APP_BACKEND_IP_ADDRESS+':8081/api/proxy/account', {
+    return fetch('http://'+process.env.REACT_APP_BACKEND_IP_ADDRESS+':8081/api/proxy/account/card', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -15,13 +15,9 @@ async function createAccount(AccDetails) {
 export default function CreateAccount() {
     let token = sessionStorage.getItem('token');
     var decodedToken = jwt_decode(token);
+    const navigate = useNavigate();
     
-    const [fullName, setFullName] = useState();
-    const [mobileNumber, setMobileNumber] = useState();
-    const [dob, setDob] = useState();
-    const [ssn, setSsn] = useState();
     const [accFriendlyName, setAccFriendlyName] = useState();
-    const cmID = decodedToken.sub;
     const userName = decodedToken.preferred_username;
 
     useEffect(() => {});
@@ -29,15 +25,10 @@ export default function CreateAccount() {
     const handleSubmit = async event => {
         event.preventDefault();
         const Account_details = await createAccount({
-            ssn,
-            dob,
-            fullName,
             userName,
-            mobileNumber,
-            cmID,
             accFriendlyName
-        });
-        console.log(Account_details);
+        });        
+        navigate('/auth/user/home');
       };
     return(
         <div className="container px-6 mx-auto">
@@ -64,55 +55,6 @@ export default function CreateAccount() {
                             />
                             <p className="mt-3 text-xs leading-3 text-gray-600">
                                 Your Ciphertrust Manager Username
-                            </p>
-                        </div>
-                        <div>
-                            <p className="text-base font-medium leading-none text-gray-800">
-                                SSN
-                            </p>
-                            <input 
-                            className="w-full p-3 mt-4 border border-gray-300 rounded outline-none focus:bg-gray-50"
-                            type="password"
-                            onChange={e => setSsn(e.target.value)}
-                            />
-                            <p className="mt-3 text-xs leading-3 text-gray-600">
-                                Your data will remain secure as per PCC compliance requirements
-                            </p>
-                        </div>
-
-                        <div>
-                            <p className="text-base font-medium leading-none text-gray-800">
-                                Full Name
-                            </p>
-                            <input 
-                            className="w-full p-3 mt-4 border border-gray-300 rounded outline-none focus:bg-gray-50"
-                            onChange={e => setFullName(e.target.value)}
-                            />
-                        </div>
-                        <div>
-                            <p className="text-base font-medium leading-none text-gray-800">
-                                Contact Number
-                            </p>
-                            <input 
-                            className="w-full p-3 mt-4 border border-gray-300 rounded outline-none focus:bg-gray-50"
-                            onChange={e => setMobileNumber(e.target.value)}
-                            />
-                            <p className="mt-3 text-xs leading-3 text-gray-600">
-                                Your data will remain secure as per PCC compliance requirements
-                            </p>
-                        </div>
-
-                        <div>
-                            <p className="text-base font-medium leading-none text-gray-800">
-                                Date Of Birth
-                            </p>
-                            <input 
-                            className="w-full p-3 mt-4 border border-gray-300 rounded outline-none focus:bg-gray-50"
-                            type="Date"
-                            onChange={e => setDob(e.target.value)}
-                            />
-                            <p className="mt-3 text-xs leading-3 text-gray-600">
-                                Your data will remain secure as per PCC compliance requirements
                             </p>
                         </div>
                         <div>

@@ -1,11 +1,19 @@
-import { Outlet, Navigate } from "react-router-dom";
+import { Outlet, Navigate, useNavigate } from "react-router-dom";
 import {React, useState} from 'react';
 import jwt_decode from "jwt-decode";
 
 function UserLayout() {
+    const navigate = useNavigate();
     const [show, setShow] = useState(false);
     const [product, setProduct] = useState(false);
     const [profile, setProfile] = useState(false);
+    const navigateToCreateCard = () => {
+        navigate('/auth/user/createAccount');
+    };
+
+    const navigateHome = () => {
+        navigate('/auth/user/home');
+    };
 
     const CustomNavbar = ({ onSelect, activeKey, ...props }) => {
         return (
@@ -93,8 +101,8 @@ function UserLayout() {
                                             {product ? (
                                                 <div>
                                                     <ul className="my-3">
-                                                        <li className="text-sm text-indigo-500 py-2 px-6"><a href="/auth/user/createAccount" className="text-black hover:text-blue-800 visited:text-black">Create</a></li>
-                                                        <li className="text-sm text-indigo-500 py-2 px-6"><a href="/auth/user/accounts" className="text-black hover:text-blue-800 visited:text-black">List</a></li>
+                                                        <li className="text-sm text-indigo-500 py-2 px-6"><a href="/auth/user/myAccount" className="text-black hover:text-blue-800 visited:text-black">Update Account Details</a></li>
+                                                        <li className="text-sm text-indigo-500 py-2 px-6"><a href="/auth/user/createAccount" className="text-black hover:text-blue-800 visited:text-black">Request New Card</a></li>
                                                     </ul>
                                                 </div>
                                             ) : (
@@ -110,7 +118,6 @@ function UserLayout() {
                                                             <path d="M10 17.5C14.1421 17.5 17.5 14.1421 17.5 10C17.5 5.85786 14.1421 2.5 10 2.5C5.85786 2.5 2.5 5.85786 2.5 10C2.5 14.1421 5.85786 17.5 10 17.5Z" stroke="currentColor" strokeWidth={1} strokeLinecap="round" strokeLinejoin="round" />
                                                         </svg>
                                                     </div>
-                                                    <p className="text-gray-800 ml-3 text-lg">Transactions</p>
                                                 </div>
                                             </li>
                                         </a>
@@ -170,8 +177,8 @@ function UserLayout() {
                                     <li className="hover:text-indigo-700 cursor-pointer h-full flex items-center text-sm text-gry-800 mx-10 tracking-normal relative">
                                         {product ? (
                                             <ul className="bg-white shadow rounded py-1 w-32 left-0 mt-16 -ml-4 absolute  top-0">
-                                                <li className="cursor-pointer text-gray-600 text-sm leading-3 tracking-normal py-3 hover:bg-gray-100 px-3 font-normal"><a href="/auth/user/createAccount" className="text-black hover:text-blue-800 visited:text-black no-underline">Create</a></li>
-                                                <li className="cursor-pointer text-gray-600 text-sm leading-3 tracking-normal py-3 hover:bg-gray-100 px-3 font-normal"><a href="/auth/user/accounts" className="text-black hover:text-blue-800 visited:text-black no-underline">List</a></li>
+                                                <li className="cursor-pointer text-gray-600 text-sm leading-3 tracking-normal py-3 hover:bg-gray-100 px-3 font-normal"><a href="/auth/user/myAccount" className="text-black hover:text-blue-800 visited:text-black no-underline">Update Account Details</a></li>
+                                                <li className="cursor-pointer text-gray-600 text-sm leading-3 tracking-normal py-3 hover:bg-gray-100 px-3 font-normal"><a href="/auth/user/createAccount" className="text-black hover:text-blue-800 visited:text-black no-underline">Request New Card</a></li>
                                             </ul>
                                         ) : (
                                             ""
@@ -184,7 +191,6 @@ function UserLayout() {
                                             </svg>
                                         </span>
                                     </li>
-                                    <li className="hover:text-indigo-700 cursor-pointer h-full flex items-center text-sm text-gry-800 mr-10 tracking-normal">Transactions</li>
                                 </ul>
                             </div>
                             <div className="h-full xl:flex hidden items-center justify-end">
@@ -245,19 +251,13 @@ function UserLayout() {
                     <div className="bg-gray-800 pt-8 pb-16 relative z-10">
                         <div className="container px-6 mx-auto flex flex-col lg:flex-row items-start lg:items-center justify-between">
                             <div className="flex-col flex lg:flex-row items-start lg:items-center">
-                                <div className="flex items-center">
-                                    <img className="border-2 shadow border-gray-600 rounded-full mr-3" src="https://cdn.tuk.dev/assets/webapp/master_layouts/boxed_layout/boxed_layout2.jpg" alt="logo" />
-                                    <div>
-                                        <h5 className="text-sm text-white leading-4 mb-1">{decodedToken.preferred_username}</h5>
-                                    </div>
-                                </div>
                                 <div className="ml-0 lg:ml-20 my-6 lg:my-0">
                                     <h4 className="text-2xl font-bold leading-tight text-white mb-2">My Account</h4>
                                 </div>
                             </div>
                             <div>
-                                <button className="focus:outline-none mr-3 bg-transparent transition duration-150 ease-in-out rounded hover:bg-gray-700 text-white px-5 py-2 text-sm border border-white">Home</button>
-                                <button className="focus:outline-none transition duration-150 ease-in-out hover:bg-gray-200 border bg-white rounded text-indigo-700 px-8 py-2 text-sm">Create Account</button>
+                                <button className="focus:outline-none mr-3 bg-transparent transition duration-150 ease-in-out rounded hover:bg-gray-700 text-white px-5 py-2 text-sm border border-white" onClick={navigateHome}>Dashboard</button>
+                                <button className="focus:outline-none transition duration-150 ease-in-out hover:bg-gray-200 border bg-white rounded text-indigo-700 px-8 py-2 text-sm" onClick={navigateToCreateCard}>Request New Card</button>
                             </div>
                         </div>
                     </div>
