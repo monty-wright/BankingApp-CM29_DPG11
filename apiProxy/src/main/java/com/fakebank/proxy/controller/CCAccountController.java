@@ -5,7 +5,6 @@ package com.fakebank.proxy.controller;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Calendar;
 import java.util.concurrent.ThreadLocalRandom;
@@ -25,10 +24,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
-import com.fakebank.proxy.bean.AccountCreateRequestBean;
-import com.fakebank.proxy.bean.CustomerAccountBean;
+import com.fakebank.proxy.bean.AccountDetailsUpdateRequestBean;
+import com.fakebank.proxy.bean.CustomerAccountPersonal;
 import com.fakebank.proxy.bean.CustomerCreditAccounts;
 import com.fakebank.proxy.bean.CustomerPersonalAccounts;
+import com.fakebank.proxy.bean.CustomerPersonalDetails;
+import com.fakebank.proxy.bean.NewCardRequestBean;
+import com.fakebank.proxy.bean.NewCreditCardBean;
 
 
 /**
@@ -42,15 +44,38 @@ public class CCAccountController {
 	private RestTemplate restTemplate;
 	
 	@CrossOrigin(origins = "*")
-	@PostMapping(value = "/api/proxy/account", produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/api/proxy/account/details", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
-	public String saveAccount(@RequestBody AccountCreateRequestBean bean) {
-		CustomerAccountBean newAccount = new CustomerAccountBean();
+	public String saveAccountDetails(@RequestBody AccountDetailsUpdateRequestBean bean) {
+		CustomerPersonalDetails acc = new CustomerPersonalDetails();
+		CustomerAccountPersonal personalDetails = new CustomerAccountPersonal();
+		
+		personalDetails.setDob(bean.getDob());
+		personalDetails.setMobile(bean.getMobileNumber());
+		personalDetails.setName(bean.getFullName());
+		personalDetails.setSsn(bean.getSsn());
+		personalDetails.setThalesId(bean.getCmID());
+		
+		acc.setUserName(bean.getUserName());
+		acc.setDetails(personalDetails);
+		
+		String dockerUri = "http://ciphertrust:9005/api/fakebank/account/personal";
+		String createResponse = restTemplate.postForObject(dockerUri, acc, String.class);
+		
+		return createResponse;
+	}
+	
+	
+	@CrossOrigin(origins = "*")
+	@PostMapping(value = "/api/proxy/account/card", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public String saveNewCard(@RequestBody NewCardRequestBean bean) {
+		NewCreditCardBean newCard = new NewCreditCardBean();
 		int cvv = ThreadLocalRandom.current().nextInt(100, 999);
 		String ccNumber = String.valueOf(ThreadLocalRandom.current().nextInt(1000, 9999)) + "-"
-				+ String.valueOf(ThreadLocalRandom.current().nextInt(1000, 9999)) + "-"
-						+ String.valueOf(ThreadLocalRandom.current().nextInt(1000, 9999)) + "-"
-								+ String.valueOf(ThreadLocalRandom.current().nextInt(1000, 9999));
+			+ String.valueOf(ThreadLocalRandom.current().nextInt(1000, 9999)) + "-"
+			+ String.valueOf(ThreadLocalRandom.current().nextInt(1000, 9999)) + "-"
+			+ String.valueOf(ThreadLocalRandom.current().nextInt(1000, 9999));
 		
 		Calendar c = Calendar.getInstance();
 		c.setTime(c.getTime());
@@ -58,22 +83,27 @@ public class CCAccountController {
 		DateFormat dateFormat = new SimpleDateFormat("mm/dd/yyyy");  
         String expDate = dateFormat.format(c.getTime());
 		
-		newAccount.setAccountBalance(0);
-		newAccount.setCcCvv(String.valueOf(cvv));
-		newAccount.setCcNumber(ccNumber);
-		newAccount.setCcExpiry(expDate);
-		newAccount.setFullName(bean.getFullName());
-		newAccount.setDob(bean.getDob());
-		newAccount.setSsn(bean.getSsn());
-		newAccount.setMobileNumber(bean.getMobileNumber());
-		newAccount.setUserName(bean.getUserName());
-		newAccount.setIntCmId(bean.getCmID());
-		newAccount.setAccFriendlyName(bean.getAccFriendlyName());
+        newCard.setCcNumber(ccNumber);
+        newCard.setCvv(String.valueOf(cvv));
+        newCard.setExpDate(expDate);
+		newCard.setBalance(String.valueOf(0));
+		newCard.setFriendlyName(bean.getAccFriendlyName());
+		newCard.setUserName(bean.getUserName());
 		
-		String dockerUri = "http://ciphertrust:9005/api/fakebank/account";
-		String createResponse = restTemplate.postForObject(dockerUri, newAccount, String.class);
+		String dockerUri = "http://ciphertrust:9005/api/fakebank/account/card";
+		String createResponse = restTemplate.postForObject(dockerUri, newCard, String.class);
 		
 		return createResponse;
+	}
+	
+	@CrossOrigin(origins = "*")
+	@GetMapping(value = "/api/proxy/account/details/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public CustomerPersonalDetails getAccountDetails(@PathVariable("id") String id) {
+		String dockerUri = "http://ciphertrust:9005/api/fakebank/account/personal/" + id;
+		ResponseEntity<CustomerPersonalDetails> response = restTemplate.getForEntity(dockerUri, CustomerPersonalDetails.class);
+		
+		return response.getBody();
 	}
 	
 	@CrossOrigin(origins = "*")
@@ -91,7 +121,10 @@ public class CCAccountController {
 		headers.add("Authorization", "Basic " + base64Creds);
 		HttpEntity<String> request = new HttpEntity<String>(headers);
 		
-		ResponseEntity<CustomerCreditAccounts> fetchResponse = restTemplate.exchange(dockerUri, HttpMethod.GET, request, CustomerCreditAccounts.class);
+		ResponseEntity<CustomerCreditAccounts> fetchResponse = restTemplate.exchange(dockerUri, 
+				HttpMethod.GET, 
+				request, 
+				CustomerCreditAccounts.class);
 		return fetchResponse.getBody();
 	}
 	
