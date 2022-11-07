@@ -53,7 +53,7 @@ public class CCAccountController {
 			newCardDetails.setBalance("0");
 			List<CustomerAccountCard> cards = new ArrayList<CustomerAccountCard>();
 			System.out.println(user.toString());
-			if(user.getCards().size() > 0) {
+			if(user.getCards() != null) {
 				cards = user.getCards();
 			}			
 			cards.add(newCardDetails);
