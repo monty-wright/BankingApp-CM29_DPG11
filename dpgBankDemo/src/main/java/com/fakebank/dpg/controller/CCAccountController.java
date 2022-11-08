@@ -105,6 +105,10 @@ public class CCAccountController {
 			customer.setUserName(acc.get().getUserName());
 			CustomerAccountPersonal personalDetails = acc.get().getDetails();
 			customer.setDetails(personalDetails);
+		} else {
+			customer.setUserName(id);
+			CustomerAccountPersonal personalDetails = new CustomerAccountPersonal();
+			customer.setDetails(personalDetails);
 		}
 		return customer;
 	}
@@ -114,8 +118,14 @@ public class CCAccountController {
 	public CustomerCreditAccounts getAccountsById(@PathVariable("id") String id) {
 		Optional<CustomerAccountMongoDocumentBean> acc = mongoCustomerAccountRepo.findById(id);
 		CustomerCreditAccounts res = new CustomerCreditAccounts();
-		res.setUserName(acc.get().getUserName());
-		res.setAccounts(acc.get().getCards());
+		if(acc.isPresent()) {
+			res.setUserName(acc.get().getUserName());
+			res.setAccounts(acc.get().getCards());
+		} else {
+			res.setUserName(id);
+			List<CustomerAccountCard> emptyCards = new ArrayList<CustomerAccountCard>();
+			res.setAccounts(emptyCards);
+		}
 		return res;
 	}
 	
