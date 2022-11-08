@@ -260,12 +260,12 @@ $body = @{
                 @{
                     'name' = 'details.ssn'
                     'operation' = 'reveal'
-                    'protection_policy' = "cvv_ProtectionPolicy-$counter"
+                    'protection_policy' = "SSN_ProtectionPolicy-$counter"
                     'access_policy' = "cc_access_policy-$counter"
                 },@{
                     'name' = 'details.dob'
                     'operation' = 'reveal'
-                    'protection_policy' = "CC_ProtectionPolicy-$counter"
+                    'protection_policy' = "SSN_ProtectionPolicy-$counter"
                     'access_policy' = "cc_access_policy-$counter"
                 }
             )

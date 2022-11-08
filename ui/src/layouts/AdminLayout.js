@@ -252,7 +252,7 @@ function AdminLayout() {
     var dateNow = new Date();
     
     let authToken = false;
-    if(token && (decodedToken.exp * 1000 > dateNow.getTime()) && (decodedToken.preferred_username === 'cccustomersupport')) {
+    if(token && (decodedToken.exp * 1000 > dateNow.getTime()) && (decodedToken.preferred_username !== 'ccaccountowner')) {
         authToken = true;
     } else {
         authToken = false;
