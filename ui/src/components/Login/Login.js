@@ -20,7 +20,7 @@ export default function Login() {
   const navigate = useNavigate();
   const [username, setUserName] = useState();
   const [password, setPassword] = useState();
-
+  var nonAdminUsers = ["ccaccountowner", "user1", "user2", "user3"];
   const handleSubmit = async e => {
     e.preventDefault();
     
@@ -32,7 +32,7 @@ export default function Login() {
     let token = sessionStorage.getItem('token');
     var decodedToken = jwt_decode(token);
     
-    if(decodedToken.preferred_username === 'ccaccountowner')
+    if(nonAdminUsers.indexOf(decodedToken.preferred_username) > -1)
       navigate('/auth/user/home');
     else if((decodedToken.preferred_username === 'cccustomersupport') ||(decodedToken.preferred_username === 'everyoneelse'))
       navigate('/auth/admin/home');
@@ -48,7 +48,7 @@ export default function Login() {
       var dateNow = new Date();
       
       if(decodedToken.exp * 1000 > dateNow.getTime()) {
-        if(decodedToken.preferred_username === 'ccaccountowner')
+        if(nonAdminUsers.indexOf(decodedToken.preferred_username) > -1)
           navigate('/auth/user/home');
         else if((decodedToken.preferred_username === 'cccustomersupport') ||(decodedToken.preferred_username === 'everyoneelse'))
           navigate('/auth/admin/home');

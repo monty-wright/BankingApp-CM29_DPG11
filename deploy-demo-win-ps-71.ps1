@@ -89,7 +89,8 @@ $body = @{
     'key' = "dpgKey-$counter"
     'tweak' = '1628462495815733'
     'tweak_algorithm' = 'SHA1'
-    'algorithm' = 'DESede/CBC/PKCS5Padding'
+    'algorithm' = 'FPE/FF3/ASCII'
+    'character_set_id' = $charSetId
 }
 $jsonBody = $body | ConvertTo-Json -Depth 5
 $response = Invoke-RestMethod -SkipCertificateCheck -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
@@ -105,6 +106,7 @@ $body = @{
     'tweak_algorithm' = 'SHA1'
     'algorithm' = 'FPE/AES/CARD10'
     'allow_single_char_input' = $false
+    'character_set_id' = $charSetId
 }
 $jsonBody = $body | ConvertTo-Json -Depth 5
 $response = Invoke-RestMethod -SkipCertificateCheck -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
@@ -224,7 +226,7 @@ Write-Output "Creating Access Policy for cvv use case..."
 $url = "https://$kms/api/v1/data-protection/access-policies"
 $body = @{
     'name' = "all_enc_access_policy-$counter"
-    'description' = "CC Access Policy for credit card user set"
+    'description' = "CC Access Policy for CVV user set"
     'default_reveal_type' = 'Ciphertext'
     'user_set_policy' = @(
         @{
@@ -256,11 +258,11 @@ $body = @{
             'api_url' = '/api/fakebank/account/personal'
             'json_request_post_tokens' = @(
                 @{
-                    'name' = 'ssn'
+                    'name' = 'details.ssn'
                     'operation' = 'protect'
                     'protection_policy' = "text_ProtectionPolicy-$counter"
                 },@{
-                    'name' = 'dob'
+                    'name' = 'details.dob'
                     'operation' = 'protect'
                     'protection_policy' = "text_ProtectionPolicy-$counter"
                 }
@@ -303,12 +305,12 @@ $body = @{
                 @{
                     'name' = 'details.ssn'
                     'operation' = 'reveal'
-                    'protection_policy' = "text_ProtectionPolicy-$counter"
+                    'protection_policy' = "CC_ProtectionPolicy-$counter"
                     'access_policy' = "last_four_show_access_policy-$counter"
                 },@{
                     'name' = 'details.dob'
                     'operation' = 'reveal'
-                    'protection_policy' = "text_ProtectionPolicy-$counter"
+                    'protection_policy' = "CC_ProtectionPolicy-$counter"
                     'access_policy' = "last_four_show_access_policy-$counter"
                 }
             )

@@ -252,7 +252,8 @@ function AdminLayout() {
     var dateNow = new Date();
     
     let authToken = false;
-    if(token && (decodedToken.exp * 1000 > dateNow.getTime()) && (decodedToken.preferred_username !== 'ccaccountowner')) {
+    var nonAdminUsers = ["ccaccountowner", "user1", "user2", "user3"];
+    if(token && (decodedToken.exp * 1000 > dateNow.getTime()) && (nonAdminUsers.indexOf(decodedToken.preferred_username) < 0)) {
         authToken = true;
     } else {
         authToken = false;
