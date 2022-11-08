@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import jwt_decode from "jwt-decode";
+import { useNavigate } from "react-router-dom";
 
 export default function UserDashboard() {
     let token = sessionStorage.getItem('token');
     var decodedToken = jwt_decode(token);
     
+    const navigate = useNavigate();
     const [fullName, setFullName] = useState('');
     const [mobileNumber, setMobileNumber] = useState();
     const [dob, setDob] = useState();
@@ -18,10 +20,14 @@ export default function UserDashboard() {
           .get('http://'+process.env.REACT_APP_BACKEND_IP_ADDRESS+':8081/api/proxy/account/details/'+decodedToken.preferred_username)
           .then((res) => {
             console.log(res.data.details);
-            setFullName(res.data.details.name);
-            setMobileNumber(res.data.details.mobile);
-            setDob(res.data.details.dob);
-            setSsn(res.data.details.ssn);
+            if(res.data.details.ssn === null) {
+                navigate('/auth/user/createFirst');
+            } else {
+                setFullName(res.data.details.name);
+                setMobileNumber(res.data.details.mobile);
+                setDob(res.data.details.dob);
+                setSsn(res.data.details.ssn);
+            }
           })
           .catch((err) => console.log(err));
 
@@ -33,8 +39,8 @@ export default function UserDashboard() {
           .catch((err) => console.log(err));
       }, []);
     
-      const cards = {};
-      for (const account of accounts) {
+    const cards = {};
+    for (const account of accounts) {
         if (account.friendlyName in cards) {
           cards[account.friendlyName].push(account);
         } else {

@@ -12,6 +12,7 @@ import Logout from './components/Login/Logout';
 import List from './components/Account/List';
 import My from './components/Account/My';
 import UserDashboard from './components/Dashboard/UserDashboard';
+import CreateFirst from './components/Account/CreateFirst';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
             <Route path="myAccount" element={<My />} />
             <Route path="accounts" element={<Account />} />
             <Route path="createAccount" element={<CreateAccount />} />
+            <Route path="createFirst" element={<CreateFirst />} />
           </Route>
           <Route path="/auth/admin" element={<AdminLayout />}>
             <Route exact path="home" element={<List />} />

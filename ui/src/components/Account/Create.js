@@ -20,14 +20,12 @@ export default function CreateAccount() {
     const [accFriendlyName, setAccFriendlyName] = useState();
     const userName = decodedToken.preferred_username;
 
-    useEffect(() => {});
-
     const handleSubmit = async event => {
         event.preventDefault();
         const Account_details = await createAccount({
             userName,
             accFriendlyName
-        });        
+        });
         navigate('/auth/user/home');
       };
     return(
