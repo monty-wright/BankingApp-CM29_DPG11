@@ -83,17 +83,15 @@ $charSetId = $response.id
 Write-Output "Creating Protection Policy for CVV Number..."
 $url = "https://$kms/api/v1/data-protection/protection-policies"
 $body = @{
-    'name' = "cvv_ProtectionPolicy-$counter"
+    'name' = "text_ProtectionPolicy-$counter"
     'key' = "dpgKey-$counter"
-    'tweak' = '1628462495815733'
-    'tweak_algorithm' = 'SHA1'
-    'algorithm' = 'FPE/FF1v2/UNICODE'
-    'character_set_id' = $charSetId
-    'allow_single_char_input' = $false
+    #'tweak' = '1628462495815733'
+    'tweak_algorithm' = 'SHA256'
+    'algorithm' = 'AES/CBC/NoPadding'
 }
 $jsonBody = $body | ConvertTo-Json -Depth 5
 $response = Invoke-RestMethod -SkipCertificateCheck -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
-$cvvPolicyId = $response.id
+$textPolicyId = $response.id
 
 #Creating CC Number Protection Policy
 Write-Output "Creating Protection Policy for Credit Card Number..."
@@ -111,20 +109,38 @@ $response = Invoke-RestMethod -SkipCertificateCheck -Method 'Post' -Uri $url -Bo
 $ccPolicyId = $response.id
 
 #Creating SSN Protection Policy
-Write-Output "Creating Protection Policy for SSN..."
-$url = "https://$kms/api/v1/data-protection/protection-policies"
-$body = @{
-    'name' = "SSN_ProtectionPolicy-$counter"
-    'key' = "dpgKey-$counter"
-    'tweak' = '1628462495815733'
-    'tweak_algorithm' = 'SHA1'
-    'algorithm' = 'FPE/FF1v2/UNICODE'
-    'character_set_id' = $charSetId
-    'allow_single_char_input' = $false
+#Write-Output "Creating Protection Policy for SSN..."
+#$url = "https://$kms/api/v1/data-protection/protection-policies"
+#$body = @{
+#    'name' = "SSN_ProtectionPolicy-$counter"
+#    'key' = "dpgKey-$counter"
+#    'tweak' = '1628462495815733'
+#    'tweak_algorithm' = 'SHA1'
+#    'algorithm' = 'FPE/FF1v2/UNICODE'
+#    'character_set_id' = $charSetId
+#    'allow_single_char_input' = $false
+#}
+#$jsonBody = $body | ConvertTo-Json -Depth 5
+#$response = Invoke-RestMethod -SkipCertificateCheck -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+#$ssnPolicyId = $response.id
+
+Write-Output "Creating sample users..."
+#ccaccountowner, cccustomersupport, everyoneelse --- password is same for all...KeySecure01!
+$users = "ccaccountowner","cccustomersupport","everyoneelse","user1","user2","user3"
+foreach ($user in $users)
+{
+    $url = "https://$kms/api/v1/usermgmt/users"
+    $body = @{
+        'email' = "$user@local"
+        'name' = $user
+        'username' = $user
+        'password' = 'KeySecure01!'
+        'app_metadata' = @{}
+        'user_metadata' = @{}
+    }
+    $jsonBody = $body | ConvertTo-Json -Depth 5
+    Invoke-RestMethod -SkipCertificateCheck -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
 }
-$jsonBody = $body | ConvertTo-Json -Depth 5
-$response = Invoke-RestMethod -SkipCertificateCheck -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
-$ssnPolicyId = $response.id
 
 #Creating User Sets
 Write-Output "Creating PlainText User Set..."
@@ -132,7 +148,7 @@ $url = "https://$kms/api/v1/data-protection/user-sets"
 $body = @{
     'name' = "plainttextuserset-$counter"
     'description' = "plain text user set for card account owner"
-    'users' = @('ccaccountowner')
+    'users' = @('ccaccountowner', 'user1', 'user2', 'user3')
 }
 $jsonBody = $body | ConvertTo-Json -Depth 5
 $response = Invoke-RestMethod -SkipCertificateCheck -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
@@ -178,10 +194,9 @@ $maskingPolicyId = $response.id
 Write-Output "Creating Access Policy for Credit Card use case..."
 $url = "https://$kms/api/v1/data-protection/access-policies"
 $body = @{
-    'name' = "cc_access_policy-$counter"
+    'name' = "last_four_show_access_policy-$counter"
     'description' = "CC Access Policy for credit card user set"
-    'default_reveal_type' = 'Error Replacement Value'
-    'default_error_replacement_value' = '000000'
+    'default_reveal_type' = 'Ciphertext'
     'user_set_policy' = @(
         @{
             'user_set_id' = $plainTextUserSetId
@@ -191,6 +206,32 @@ $body = @{
             'user_set_id' = $maskedTextUserSetId
             'reveal_type' = 'Masked Value'
             'masking_format_id' = $maskingPolicyId
+        },
+        @{
+            'user_set_id' = $encTextUserSetId
+            'reveal_type' = 'Ciphertext'
+        }
+    )
+}
+$jsonBody = $body | ConvertTo-Json -Depth 5
+$response = Invoke-RestMethod -SkipCertificateCheck -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+$accessPolicyId = $response.id
+
+#Creating Access Policies
+Write-Output "Creating Access Policy for cvv use case..."
+$url = "https://$kms/api/v1/data-protection/access-policies"
+$body = @{
+    'name' = "all_enc_access_policy-$counter"
+    'description' = "CC Access Policy for credit card user set"
+    'default_reveal_type' = 'Ciphertext'
+    'user_set_policy' = @(
+        @{
+            'user_set_id' = $plainTextUserSetId
+            'reveal_type' = 'Plaintext'
+        },
+        @{
+            'user_set_id' = $maskedTextUserSetId
+            'reveal_type' = 'Ciphertext'
         },
         @{
             'user_set_id' = $encTextUserSetId
@@ -215,11 +256,11 @@ $body = @{
                 @{
                     'name' = 'ssn'
                     'operation' = 'protect'
-                    'protection_policy' = "SSN_ProtectionPolicy-$counter"
+                    'protection_policy' = "text_ProtectionPolicy-$counter"
                 },@{
                     'name' = 'dob'
                     'operation' = 'protect'
-                    'protection_policy' = "SSN_ProtectionPolicy-$counter"
+                    'protection_policy' = "text_ProtectionPolicy-$counter"
                 }
             )
         },
@@ -234,7 +275,7 @@ $body = @{
                 @{
                     'name' = 'cvv'
                     'operation' = 'protect'
-                    'protection_policy' = "cvv_ProtectionPolicy-$counter"
+                    'protection_policy' = "text_ProtectionPolicy-$counter"
                 }
             )
         },
@@ -244,13 +285,13 @@ $body = @{
                 @{
                     'name' = 'accounts.[*].cvv'
                     'operation' = 'reveal'
-                    'protection_policy' = "cvv_ProtectionPolicy-$counter"
-                    'access_policy' = "cc_access_policy-$counter"
+                    'protection_policy' = "text_ProtectionPolicy-$counter"
+                    'access_policy' = "all_enc_access_policy-$counter"
                 },@{
                     'name' = 'accounts.[*].ccNumber'
                     'operation' = 'reveal'
                     'protection_policy' = "CC_ProtectionPolicy-$counter"
-                    'access_policy' = "cc_access_policy-$counter"
+                    'access_policy' = "last_four_show_access_policy-$counter"
                 }
             )
         },
@@ -260,13 +301,13 @@ $body = @{
                 @{
                     'name' = 'details.ssn'
                     'operation' = 'reveal'
-                    'protection_policy' = "SSN_ProtectionPolicy-$counter"
-                    'access_policy' = "cc_access_policy-$counter"
+                    'protection_policy' = "text_ProtectionPolicy-$counter"
+                    'access_policy' = "last_four_show_access_policy-$counter"
                 },@{
                     'name' = 'details.dob'
                     'operation' = 'reveal'
-                    'protection_policy' = "SSN_ProtectionPolicy-$counter"
-                    'access_policy' = "cc_access_policy-$counter"
+                    'protection_policy' = "text_ProtectionPolicy-$counter"
+                    'access_policy' = "last_four_show_access_policy-$counter"
                 }
             )
         }
@@ -313,45 +354,6 @@ $body = @{
 $jsonBody = $body | ConvertTo-Json -Depth 5
 $response = Invoke-RestMethod -SkipCertificateCheck -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
 $regToken = $response.reg_token
-
-#ohhh...this one is the final step...adding few users
-Write-Output "Creating sample users..."
-#ccaccountowner, cccustomersupport, everyoneelse --- password is same for all...KeySecure01!
-$url = "https://$kms/api/v1/usermgmt/users"
-$body = @{
-    'email' = 'ccaccountowner@local'
-    'name' = 'ccaccountowner'
-    'username' = 'ccaccountowner'
-    'password' = 'KeySecure01!'
-    'app_metadata' = @{}
-    'user_metadata' = @{}
-}
-$jsonBody = $body | ConvertTo-Json -Depth 5
-Invoke-RestMethod -SkipCertificateCheck -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
-
-$url = "https://$kms/api/v1/usermgmt/users"
-$body = @{
-    'email' = 'cccustomersupport@local'
-    'name' = 'cccustomersupport'
-    'username' = 'cccustomersupport'
-    'password' = 'KeySecure01!'
-    'app_metadata' = @{}
-    'user_metadata' = @{}
-}
-$jsonBody = $body | ConvertTo-Json -Depth 5
-Invoke-RestMethod -SkipCertificateCheck -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
-
-$url = "https://$kms/api/v1/usermgmt/users"
-$body = @{
-    'email' = 'everyoneelse@local'
-    'name' = 'everyoneelse'
-    'username' = 'everyoneelse'
-    'password' = 'KeySecure01!'
-    'app_metadata' = @{}
-    'user_metadata' = @{}
-}
-$jsonBody = $body | ConvertTo-Json -Depth 5
-Invoke-RestMethod -SkipCertificateCheck -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
 
 [string[]]$fileContent = Get-Content ".\docker-compose-template.yml"
 $content = ''
