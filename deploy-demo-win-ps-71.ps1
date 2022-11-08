@@ -3,6 +3,8 @@ $password = "ChangeIt!"
 $kms = "1.1.1.1"
 $counter = "demo"
 
+Import-Module powershell-yaml
+
 Write-Output "-----------------------------------------------------------------"
 Write-Output "Next few steps will create boilerplate config on your CM instance"
 Write-Output "-----------------------------------------------------------------"
@@ -85,9 +87,9 @@ $url = "https://$kms/api/v1/data-protection/protection-policies"
 $body = @{
     'name' = "text_ProtectionPolicy-$counter"
     'key' = "dpgKey-$counter"
-    #'tweak' = '1628462495815733'
-    'tweak_algorithm' = 'SHA256'
-    'algorithm' = 'AES/CBC/NoPadding'
+    'tweak' = '1628462495815733'
+    'tweak_algorithm' = 'SHA1'
+    'algorithm' = 'DESede/CBC/PKCS5Padding'
 }
 $jsonBody = $body | ConvertTo-Json -Depth 5
 $response = Invoke-RestMethod -SkipCertificateCheck -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
@@ -370,7 +372,7 @@ $yamlObj.services.api.environment = @(
     "CMIP=https://$kms"
 )
 
-$yaml = ConvertTo-YAML $yamlObj | .\yq.exe
+$yaml = ConvertTo-YAML $yamlObj | yq
 Set-Content -Path ".\docker-compose.yml" -Value $yaml
 
 Write-Output "`n"
@@ -383,4 +385,4 @@ Write-Output "| CMIP: https://=$kms"
 Write-Output "|__________________________________________________________________________|"
 
 Write-Output "Running demo application now..."
-docker compose up
+sudo docker compose up
