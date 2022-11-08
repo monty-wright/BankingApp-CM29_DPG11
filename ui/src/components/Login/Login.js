@@ -34,7 +34,7 @@ export default function Login() {
     
     if(decodedToken.preferred_username === 'ccaccountowner')
       navigate('/auth/user/home');
-    else if(decodedToken.preferred_username !== 'ccaccountowner')
+    else if((decodedToken.preferred_username === 'cccustomersupport') ||(decodedToken.preferred_username === 'everyoneelse'))
       navigate('/auth/admin/home');
     else
         navigate('/login');
@@ -50,7 +50,7 @@ export default function Login() {
       if(decodedToken.exp * 1000 > dateNow.getTime()) {
         if(decodedToken.preferred_username === 'ccaccountowner')
           navigate('/auth/user/home');
-        else if(decodedToken.preferred_username !== 'ccaccountowner')
+        else if((decodedToken.preferred_username === 'cccustomersupport') ||(decodedToken.preferred_username === 'everyoneelse'))
           navigate('/auth/admin/home');
         else
           navigate('/login');
