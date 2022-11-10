@@ -31,7 +31,7 @@ Connect-CipherTrustManager `
 
 #Create a key
 Write-Output "Creating a Key"
-$keySuccess = Get-CM_CreateKey `
+$keySuccess = New-CMKey  `
     -keyname $keyname `
     -usageMask $usageMask `
     -algorithm $algorithm `
@@ -42,7 +42,7 @@ if (-NOT $keySuccess) {
 Write-Output "...Done"
 
 #Get local root CA ID
-$caID = Get-CM_ListLocalCAs `
+$caID = Find-CMCAs `
     -subject "/C=US/ST=TX/L=Austin/O=Thales/CN=CipherTrust Root CA"
 #if (-NOT $caID){
 #    Write-Error "Unable to find CA" -ErrorAction Stop
@@ -50,7 +50,7 @@ $caID = Get-CM_ListLocalCAs `
 
 #Create an NAE network interface
 Write-Output "Creating an NAE network interface"
-$interfaceSuccess = Get-CM_AddInterface `
+$interfaceSuccess = New-CMInterface `
     -port $nae_port `
     -cert_user_field CN -mode 'tls-cert-pw-opt' `
     -auto_gen_ca_id $caId `
@@ -63,13 +63,13 @@ Write-Output "...Done"
 
 #Creating Character Set
 Write-Output "Creating Character Set..."
-$charSetId = Get-CM_CreateCharacterSet `
+$charSetId = New-CMCharacterSet `
     -name "DPGAlphaNum-$counter" `
     -range @('0030-0039', '0041-005A', '0061-007A') `
     -encoding 'UTF-8'
 #if already exists... go get the id
 if (-NOT $charSetId) {
-    $charsetList = Get-CM_ListCharacterSets `
+    $charsetList = Find-CMCharacterSets `
         -name "DPGAlphaNum-$counter"
     $charSetId = $charsetList.resources[0].id
 }
@@ -79,7 +79,7 @@ Write-Output "...Done"
 Write-Output "Creating Protection Policies...."
 #Creating CVV Protection Policy
 Write-Output "---Creating Protection Policy for CVV Number..."
-$null = Get-CM_CreateProtectionPolicy `
+$null = New-CMProtectionPolicy `
     -name "cvv_ProtectionPolicy-$counter" `
     -key "dpgKey-$counter" `
     -tweak '1628462495815733' `
@@ -90,7 +90,7 @@ Write-Output "---Done"
 
 #Creating CC Number Protection Policy
 Write-Output "---Creating Protection Policy for Credit Card Number..."
-$null = Get-CM_CreateProtectionPolicy `
+$null = New-CMProtectionPolicy `
     -name "CC_ProtectionPolicy-$counter" `
     -key "dpgKey-$counter" `
     -tweak '9828462495846783' `
@@ -100,7 +100,7 @@ Write-Output "---Done"
 
 #Creating SSN Protection Policy
 Write-Output "---Creating Protection Policy for SSN..."
-$null = Get-CM_CreateProtectionPolicy `
+$null = New-CMProtectionPolicy `
     -name "SSN_ProtectionPolicy-$counter" `
     -key "dpgKey-$counter" `
     -tweak '1628462495815733' `
@@ -113,39 +113,39 @@ Write-Output "...Done"
 
 #Creating User Sets
 Write-Output "Creating PlainText User Set..."
-$plainTextUserSetId = Get-CM_CreateUserSet `
+$plainTextUserSetId = New-CMUserSet `
     -name "plainttextuserset-$counter" `
     -description "plain text user set for card account owner" `
     -users @('ccaccountowner')
 #if already exists... go get the id
 if (-NOT $plainTextUserSetId) {
-    $userList = Get-CM_ListUserSets `
+    $userList = Find-CMUserSets  `
         -name "plainttextuserset-$counter"
     $plainTextUserSetId = $userList.resources[0].id
 }
 Write-Output "...Done"
 
 Write-Output "Creating Masked Data User Set..."
-$maskedTextUserSetId = Get-CM_CreateUserSet `
+$maskedTextUserSetId = New-CMUserSet `
     -name "maskedtextuserset-$counter" `
     -description "masked text user set for CS exec" `
     -users @('cccustomersupport')
 #if already exists... go get the id
 if (-NOT $maskedTextUserSetId) {
-    $userList = Get-CM_ListUserSets `
+    $userList = Find-CMUserSets  `
         -name "maskedtextuserset-$counter"
     $maskedTextUserSetId = $userList.resources[0].id
 }
 Write-Output "...Done"
 
 Write-Output "Creating Encrypted Data User Set..."
-$encTextUserSetId = Get-CM_CreateUserSet `
+$encTextUserSetId = New-CMUserSet `
     -name "enctextuserset-$counter" `
     -description "encrypted text user set for everyone else" `
     -users @('everyoneelse')
 #if already exists... go get the id
 if (-NOT $encTextUserSetId) {
-    $userList = Get-CM_ListUserSets `
+    $userList = Find-CMUserSets  `
         -name "enctextuserset-$counter"
     $encTextUserSetId = $userList.resources[0].id
 }
@@ -154,7 +154,7 @@ Write-Output "...Done"
 
 #Creating Masking Policies
 Write-Output "Creating masking policy for CC..."
-$maskingPolicyId = Get-CM_CreateMaskingFormat `
+$maskingPolicyId = New-CMMaskingFormat `
     -name "cc_masking_format-$counter" `
     -starting_characters 0 `
     -ending_characters 4 `
@@ -162,7 +162,7 @@ $maskingPolicyId = Get-CM_CreateMaskingFormat `
     -Show
 #if already exists... go get the id
 if (-NOT $maskingPolicyId) {
-    $MaskingFormatList = Get-CM_ListMaskingFormats `
+    $MaskingFormatList = Find-CMMaskingFormats `
         -name "cc_policy-$counter"
     $maskingPolicyId = $MaskingFormatList.resources[0].id
 }
@@ -175,7 +175,7 @@ Write-Output "Creating Access Policies for Credit Card use case..."
 Write-Output "---Creating User Set for Plaintext"
 #Creating User Set Policies
 $user_set_policies = @()
-$user_set_policies = Get-CM_CreateUserSetPolicy `
+$user_set_policies = New-CMUserSetPolicy `
     -user_set_policy $user_set_policies `
     -user_set_id $plainTextUserSetId `
     -reveal_type Plaintext
@@ -183,7 +183,7 @@ $user_set_policies = Get-CM_CreateUserSetPolicy `
 Write-Output "---Done"
 
 Write-Output "---Creating User Set for Masked"
-$user_set_policies = Get-CM_CreateUserSetPolicy `
+$user_set_policies = New-CMUserSetPolicy `
     -user_set_policy $user_set_policies `
     -user_set_id $maskedTextUserSetId `
     -reveal_type MaskedValue `
@@ -192,7 +192,7 @@ $user_set_policies = Get-CM_CreateUserSetPolicy `
 Write-Output "---Done"
     
 Write-Output "---Creating User Set for Ciphertext"
-$user_set_policies = Get-CM_CreateUserSetPolicy `
+$user_set_policies = New-CMUserSetPolicy `
     -user_set_policy $user_set_policies `
     -user_set_id $encTextUserSetId `
     -reveal_type Ciphertext
@@ -202,7 +202,7 @@ Write-Output "---Done"
 #Creating Access Policies
 Write-Output "---Creating Access Policies"
 #$accessPolicyId = 
-$null = Get-CM_CreateAccessPolicy `
+$null = New-CMAccessPolicy `
     -name "cc_access_policy-$counter" `
     -description "CC Access Policy for credit card user set" `
     -default_reveal_type ErrorReplacement `
@@ -219,21 +219,21 @@ Write-Output "Creating DPG Policy for CC use case..."
 #Post Endpoint
 Write-Output "---Creating POST REQUEST Endpoint configuration..."
 $json_request_post_tokens = @()
-$json_request_post_tokens = Get-CM_DPG_JSONRequestResponse `
+$json_request_post_tokens = New-CMDPGJSONRequestResponse `
     -name 'ccNumber' `
     -operation Protect `
     -protection_policy "CC_ProtectionPolicy-$counter"
-$json_request_post_tokens = Get-CM_DPG_JSONRequestResponse `
+$json_request_post_tokens = New-CMDPGJSONRequestResponse `
     -json_tokens $json_request_post_tokens `
     -name 'cvv' `
     -operation Protect `
     -protection_policy "cvv_ProtectionPolicy-$counter"
-$json_request_post_tokens = Get-CM_DPG_JSONRequestResponse `
+$json_request_post_tokens = New-CMDPGJSONRequestResponse `
     -json_tokens $json_request_post_tokens `
     -name 'ssn' `
     -operation Protect `
     -protection_policy "SSN_ProtectionPolicy-$counter"
-$json_request_post_tokens = Get-CM_DPG_JSONRequestResponse `
+$json_request_post_tokens = New-CMDPGJSONRequestResponse `
     -json_tokens $json_request_post_tokens `
     -name 'dob' `
     -operation Protect `
@@ -243,24 +243,24 @@ Write-Output "---Done"
 #Get Endpoint
 Write-Output "---Creating GET RESPONSE Endpoint configuration..."
 $json_response_get_tokens = @()
-$json_response_get_tokens = Get-CM_DPG_JSONRequestResponse `
+$json_response_get_tokens = New-CMDPGJSONRequestResponse `
     -name 'accounts.[*].ccv' `
     -operation Reveal `
     -protection_policy "cvv_ProtectionPolicy-$counter" `
     -access_policy "cc_access_policy-$counter"
-$json_response_get_tokens = Get-CM_DPG_JSONRequestResponse `
+$json_response_get_tokens = New-CMDPGJSONRequestResponse `
     -json_tokens $json_response_get_tokens `
     -name 'accounts.[*].ccNumber' `
     -operation Reveal `
     -protection_policy "CC_ProtectionPolicy-$counter" `
     -access_policy "cc_access_policy-$counter"
-$json_response_get_tokens = Get-CM_DPG_JSONRequestResponse `
+$json_response_get_tokens = New-CMDPGJSONRequestResponse `
     -json_tokens $json_response_get_tokens `
     -name 'ssn' `
     -operation Reveal `
     -protection_policy "SSN_ProtectionPolicy-$counter" `
     -access_policy "cc_access_policy-$counter"
-$json_response_get_tokens = Get-CM_DPG_JSONRequestResponse `
+$json_response_get_tokens = New-CMDPGJSONRequestResponse `
     -json_tokens $json_response_get_tokens `
     -name 'dob' `
     -operation Reveal `
@@ -271,14 +271,14 @@ Write-Output "---Done"
 #Set Proxy Config
 Write-Output "---Creating Proxy Config for POST REQUEST..."
 #$proxy_config = @()
-$proxy_config = Get-CM_DPG_ProxyConfig `
+$proxy_config = New-CMDPGProxyConfig `
     -api_url '/api/fakebank/account' `
     -json_request_post_tokens $json_request_post_tokens
 #Write-HashtableArray $proxy_config -DEBUG
 Write-Output "---Done"
 
 Write-Output "---Creating Proxy Config for GET RESPONSE..."
-$proxy_config = Get-CM_DPG_ProxyConfig `
+$proxy_config = New-CMDPGProxyConfig `
     -proxy_config $proxy_config `
     -api_url '/api/fakebank/accounts/{id}' `
     -json_response_get_tokens $json_response_get_tokens
@@ -287,7 +287,7 @@ Write-Output "---Done"
 
 #Create DPG Policy
 Write-Output "---Creating DPG Policy..."
-$dpgPolicyId = Get-CM_DPG_CreatePolicy `
+$dpgPolicyId = New-CMDPGPolicy `
     -name "cc_policy-$counter"  `
     -description 'DPG policy for credit card attributes' `
     -proxy_config $proxy_config
@@ -299,7 +299,7 @@ Write-Output "...Done"
 ###Creating Application Profile
 #Final setup...creating client application
 Write-Output "Creating client profile..."
-$regToken = Get-CM_CreateClientProfile `
+$regToken = New-CMClientProfiles `
     -name "CC_profile-$counter" `
     -nae_iface_port  $nae_port `
     -app_connector_type DPG `
@@ -323,27 +323,29 @@ Write-Output "Creating sample users..."
 #ccaccountowner, cccustomersupport, everyoneelse --- password is same for all...KeySecure01!
 
 Write-Output "---Creating Account Owner..."
-Get-CM_CreateUser `
+$pssword = ConvertTo-SecureString 'KeySecure01!' -AsPlainText
+$Cred = New-Object System.Management.Automation.PSCredential ("ccaccountowner", $pssword)
+New-CMUser `
     -email 'ccaccountowner@local' `
     -name 'ccaccountowner' `
-    -username 'ccaccountowner' `
-    -password 'KeySecure01!' `
+    -ps_creds  $Cred `
     -app_metadata @{} `
     -user_metadata @{}
 Write-Output "---Done"
 
 Write-Output "---Creating Customer Support..."
-Get-CM_CreateUser `
+$pssword = ConvertTo-SecureString 'KeySecure01!' -AsPlainText
+New-CMUser `
     -email 'cccustomersupport@local' `
     -name 'cccustomersupport' `
     -username 'cccustomersupport' `
-    -password 'KeySecure01!' `
+    -secure_password  $pssword `
     -app_metadata @{} `
     -user_metadata @{}
 Write-Output "---Done"
 
 Write-Output "---Creating 'Everyone Else'..."
-Get-CM_CreateUser `
+New-CMUser `
     -email 'everyoneelse@local' `
     -name 'everyoneelse' `
     -username 'everyoneelse' `
