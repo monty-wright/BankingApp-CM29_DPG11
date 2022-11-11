@@ -166,7 +166,7 @@ Write-Output "Deleting Keys"
 $keyList = Find-CMKeys  `
     -keyname $keyname
 if ($keyList.total -eq 1) {
-    Get-CM_DeleteKey `
+    Remove-CMKey `
         -key_id $keyList.resources[0].id
 }
 else {

@@ -15,7 +15,8 @@ $kms = "192.168.136.130"
 $nae_port = 9005
 $counter = "demo1"
 $keyname = "dpgKey-$counter"
-$usageMask = 3145740
+#$usageMask = 3145740
+$usageMask = ([UsageMaskTable]::Encrypt + [UsageMaskTable]::Decrypt + [UsageMaskTable]::FPEEncrypt + [UsageMaskTable]::FPEDecrypt) #More HUMAN READABLE ;)
 $algorithm = 'aes'
 $size = 256
 
