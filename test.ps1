@@ -2,7 +2,7 @@
 #Demo Script
 ###
 
-Install-Module -Name powershell-yaml -Force -Repository PSGallery
+Import-Module -Name powershell-yaml -Force
 Import-Module CipherTrustManager -Force -ErrorAction Stop
 
 $DebugPreference = 'SilentlyContinue'
@@ -11,12 +11,12 @@ $DebugPreference = 'SilentlyContinue'
 
 $username = "admin"
 $password = "P4ssw0rd!"
-$kms = "192.168.136.130"
+$kms = "192.168.136.131"
 $nae_port = 9005
 $counter = "demo1"
 $keyname = "dpgKey-$counter"
 #$usageMask = 3145740
-$usageMask = ([UsageMaskTable]::Encrypt + [UsageMaskTable]::Decrypt + [UsageMaskTable]::FPEEncrypt + [UsageMaskTable]::FPEDecrypt) #More HUMAN READABLE ;)
+$usageMask = ([CipherTrustManager.UsageMaskTable]::Encrypt + [CipherTrustManager.UsageMaskTable]::Decrypt + [CipherTrustManager.UsageMaskTable]::FPEEncrypt + [CipherTrustManager.UsageMaskTable]::FPEDecrypt) #More HUMAN READABLE ;)
 $algorithm = 'aes'
 $size = 256
 
@@ -30,13 +30,15 @@ Connect-CipherTrustManager `
     -user $username `
     -pass $password
 
-#Create a key
+#Create a key (need to get an owner... so WHO should own this key)
 Write-Output "Creating a Key"
 $keySuccess = New-CMKey  `
-    -keyname $keyname `
+    -name $keyname `
     -usageMask $usageMask `
     -algorithm $algorithm `
-    -size $size
+    -size $size `
+    -ownerId 'local|312c1485-aa03-454c-8591-6bd41509d846' `
+    -NoVersionedKey = $false
 if (-NOT $keySuccess) {
     Write-Output "Key already created"
 }
@@ -81,11 +83,11 @@ Write-Output "Creating Protection Policies...."
 #Creating CVV Protection Policy
 Write-Output "---Creating Protection Policy for CVV Number..."
 $null = New-CMProtectionPolicy `
-    -name "cvv_ProtectionPolicy-$counter" `
+    -name "text_ProtectionPolicy-$counter" `
     -key "dpgKey-$counter" `
     -tweak '1628462495815733' `
     -tweak_algorithm 'SHA1' `
-    -algorithm 'FPE/FF1v2/UNICODE' `
+    -algorithm 'FPE/FF3/ASCII' `
     -character_set_id $charSetId 
 Write-Output "---Done"
 
@@ -96,20 +98,39 @@ $null = New-CMProtectionPolicy `
     -key "dpgKey-$counter" `
     -tweak '9828462495846783' `
     -tweak_algorithm 'SHA1' `
-    -algorithm 'FPE/AES/CARD10'
+    -algorithm 'FPE/FF3/CARD10' 
 Write-Output "---Done"
 
 #Creating SSN Protection Policy
-Write-Output "---Creating Protection Policy for SSN..."
-$null = New-CMProtectionPolicy `
-    -name "SSN_ProtectionPolicy-$counter" `
-    -key "dpgKey-$counter" `
-    -tweak '1628462495815733' `
-    -tweak_algorithm 'SHA1' `
-    -algorithm 'FPE/FF1v2/UNICODE' `
-    -character_set_id $charSetId
-Write-Output "---Done"
+# Write-Output "---Creating Protection Policy for SSN..."
+# $null = New-CMProtectionPolicy `
+#     -name "SSN_ProtectionPolicy-$counter" `
+#     -key "dpgKey-$counter" `
+#     -tweak '1628462495815733' `
+#     -tweak_algorithm 'SHA1' `
+#     -algorithm 'FPE/FF3/UNICODE' `
+#     -character_set_id $charSetId 
+# Write-Output "---Done"
 ###Done Creating Protection Policies
+Write-Output "...Done"
+
+###Creating Users
+Write-Output "Creating sample users..."
+#ccaccountowner, cccustomersupport, everyoneelse, user1, user2, user3 --- password is same for all...KeySecure01!
+$pssword = ConvertTo-SecureString 'KeySecure01!' -AsPlainText
+$Cred = New-Object System.Management.Automation.PSCredential ("ccaccountowner", $pssword)
+$users = "ccaccountowner","cccustomersupport","everyoneelse","user1","user2","user3"
+foreach ($user in $users){
+    Write-Output "---Creating account for $user..."
+    New-CMUser `
+        -email "$($user)@local" `
+        -name $user `
+        -ps_creds  $Cred `
+        -app_metadata @{} `
+        -user_metadata @{}
+    Write-Output "---Done"
+}
+###Done Creating Users
 Write-Output "...Done"
 
 #Creating User Sets
@@ -117,7 +138,7 @@ Write-Output "Creating PlainText User Set..."
 $plainTextUserSetId = New-CMUserSet `
     -name "plainttextuserset-$counter" `
     -description "plain text user set for card account owner" `
-    -users @('ccaccountowner')
+    -users @('ccaccountowner', 'user1', 'user2', 'user3')
 #if already exists... go get the id
 if (-NOT $plainTextUserSetId) {
     $userList = Find-CMUserSets  `
@@ -170,10 +191,9 @@ if (-NOT $maskingPolicyId) {
 Write-Output "...Done"
 #Done Creating Masking Policies
 
-###Creating Access Policies
-Write-Output "Creating Access Policies for Credit Card use case..."
-
-Write-Output "---Creating User Set for Plaintext"
+###Creatng User Set Policies
+Write-Output "Creating User Set Policies for use of Access Policies..."
+Write-Output "---Creating User Set Policy for Plaintext"
 #Creating User Set Policies
 $user_set_policies = @()
 $user_set_policies = New-CMUserSetPolicy `
@@ -183,7 +203,7 @@ $user_set_policies = New-CMUserSetPolicy `
 #Write-HashtableArray $user_set_policies
 Write-Output "---Done"
 
-Write-Output "---Creating User Set for Masked"
+Write-Output "---Creating User Set Policy for Masked"
 $user_set_policies = New-CMUserSetPolicy `
     -user_set_policy $user_set_policies `
     -user_set_id $maskedTextUserSetId `
@@ -192,89 +212,108 @@ $user_set_policies = New-CMUserSetPolicy `
 #Write-HashtableArray $user_set_policies
 Write-Output "---Done"
     
-Write-Output "---Creating User Set for Ciphertext"
+Write-Output "---Creating User Set Policy for Ciphertext"
 $user_set_policies = New-CMUserSetPolicy `
     -user_set_policy $user_set_policies `
     -user_set_id $encTextUserSetId `
     -reveal_type Ciphertext
 #Write-HashtableArray $user_set_policies
 Write-Output "---Done"
+Write-Output "...Done"
+
     
-#Creating Access Policies
-Write-Output "---Creating Access Policies"
+###Creating Access Policies
+Write-Output "Creating Access Policies for Credit Card use case..."
 #$accessPolicyId = 
 $null = New-CMAccessPolicy `
-    -name "cc_access_policy-$counter" `
+    -name "last_four_show_access_policy-$counter" `
     -description "CC Access Policy for credit card user set" `
     -default_reveal_type ErrorReplacement `
     -default_error_replacement_value '000000' `
     -user_set_policy $user_set_policies
-Write-Output "---Done"
-###Done Creating Access Policies
 Write-Output "...Done"
 ###Done Creating Access Policies
 
-###Creating DPG Policy
-#This is the interesting step...defining DPG policies for the API endpoints
-Write-Output "Creating DPG Policy for CC use case..."
+Write-Output "Creating Access Policies for cvv use case..."    
+#$accessPolicyId = 
+$null = New-CMAccessPolicy `
+    -name "all_enc_access_policy-$counter" `
+    -description "CC Access Policy for CVV user set" `
+    -default_reveal_type Ciphertext `
+    -user_set_policy $user_set_policies
+###Done Creating Access Policies
+Write-Output "...Done"
+
+###Creating Proxy Config for DPG Policies....
+Write-Output "Creating Proxy Config for DPG Policies...."
 #Post Endpoint
-Write-Output "---Creating POST REQUEST Endpoint configuration..."
-$json_request_post_tokens = @()
-$json_request_post_tokens = New-CMDPGJSONRequestResponse `
+Write-Output "---Creating POST REQUEST Endpoint configuration for 'api_url' = '/api/fakebank/account/personal'..."
+$json_request_post_tokens_personal = @()
+$json_request_post_tokens_personal = New-CMDPGJSONRequestResponse `
+    -name 'details.ssn' `
+    -operation Protect `
+    -protection_policy "text_ProtectionPolicy-$counter"
+$json_request_post_tokens_personal = New-CMDPGJSONRequestResponse `
+    -json_tokens $json_request_post_tokens_personal `
+    -name 'details.dob' `
+    -operation Protect `
+    -protection_policy "text_ProtectionPolicy-$counter"
+Write-Output "---Done"
+
+Write-Output "---Creating POST REQUEST Endpoint configuration for 'api_url' = '/api/fakebank/account/card'..."
+$json_request_post_tokens_card = @()
+$json_request_post_tokens_card = New-CMDPGJSONRequestResponse `
     -name 'ccNumber' `
     -operation Protect `
     -protection_policy "CC_ProtectionPolicy-$counter"
-$json_request_post_tokens = New-CMDPGJSONRequestResponse `
-    -json_tokens $json_request_post_tokens `
+$json_request_post_tokens_card = New-CMDPGJSONRequestResponse `
+    -json_tokens $json_request_post_tokens_card `
     -name 'cvv' `
     -operation Protect `
-    -protection_policy "cvv_ProtectionPolicy-$counter"
-$json_request_post_tokens = New-CMDPGJSONRequestResponse `
-    -json_tokens $json_request_post_tokens `
-    -name 'ssn' `
-    -operation Protect `
-    -protection_policy "SSN_ProtectionPolicy-$counter"
-$json_request_post_tokens = New-CMDPGJSONRequestResponse `
-    -json_tokens $json_request_post_tokens `
-    -name 'dob' `
-    -operation Protect `
-    -protection_policy "SSN_ProtectionPolicy-$counter"
+    -protection_policy "text_ProtectionPolicy-$counter"
 Write-Output "---Done"
 
 #Get Endpoint
-Write-Output "---Creating GET RESPONSE Endpoint configuration..."
-$json_response_get_tokens = @()
-$json_response_get_tokens = New-CMDPGJSONRequestResponse `
+Write-Output "---Creating GET RESPONSE Endpoint configuration for 'api_url' = '/api/fakebank/accounts/{id}'..."
+$json_response_get_tokens_accounts = @()
+$json_response_get_tokens_accounts = New-CMDPGJSONRequestResponse `
     -name 'accounts.[*].ccv' `
     -operation Reveal `
-    -protection_policy "cvv_ProtectionPolicy-$counter" `
-    -access_policy "cc_access_policy-$counter"
-$json_response_get_tokens = New-CMDPGJSONRequestResponse `
-    -json_tokens $json_response_get_tokens `
+    -protection_policy "text_ProtectionPolicy-$counter" `
+    -access_policy "all_enc_access_policy-demo"
+$json_response_get_tokens_accounts = New-CMDPGJSONRequestResponse `
+    -json_tokens $json_response_get_tokens_accounts `
     -name 'accounts.[*].ccNumber' `
     -operation Reveal `
     -protection_policy "CC_ProtectionPolicy-$counter" `
-    -access_policy "cc_access_policy-$counter"
-$json_response_get_tokens = New-CMDPGJSONRequestResponse `
-    -json_tokens $json_response_get_tokens `
-    -name 'ssn' `
+    -access_policy "last_four_show_access_policy-demo"
+Write-Output "---Done"
+
+Write-Output "---Creating GET RESPONSE Endpoint configuration for 'api_url' = '/api/fakebank/details/{id}'..."
+$json_response_get_tokens_details = @()
+$json_response_get_tokens_details = New-CMDPGJSONRequestResponse `
+    -name 'details.ssn' `
     -operation Reveal `
-    -protection_policy "SSN_ProtectionPolicy-$counter" `
-    -access_policy "cc_access_policy-$counter"
-$json_response_get_tokens = New-CMDPGJSONRequestResponse `
-    -json_tokens $json_response_get_tokens `
-    -name 'dob' `
+    -protection_policy "CC_ProtectionPolicy-$counter" `
+    -access_policy "all_enc_access_policy-demo"
+$json_response_get_tokens_details = New-CMDPGJSONRequestResponse `
+    -json_tokens $json_response_get_tokens_details `
+    -name 'details.dob' `
     -operation Reveal `
-    -protection_policy "SSN_ProtectionPolicy-$counter" `
-    -access_policy "cc_access_policy-$counter"
+    -protection_policy "CC_ProtectionPolicy-$counter" `
+    -access_policy "last_four_show_access_policy-demo"
 Write-Output "---Done"
 
 #Set Proxy Config
 Write-Output "---Creating Proxy Config for POST REQUEST..."
 #$proxy_config = @()
 $proxy_config = New-CMDPGProxyConfig `
-    -api_url '/api/fakebank/account' `
-    -json_request_post_tokens $json_request_post_tokens
+    -api_url '/api/fakebank/account/personal' `
+    -json_request_post_tokens $json_request_post_tokens_personal
+$proxy_config = New-CMDPGProxyConfig `
+    -proxy_config $proxy_config `
+    -api_url '/api/fakebank/account/card' `
+    -json_request_post_tokens $json_request_post_tokens_card
 #Write-HashtableArray $proxy_config -DEBUG
 Write-Output "---Done"
 
@@ -282,19 +321,28 @@ Write-Output "---Creating Proxy Config for GET RESPONSE..."
 $proxy_config = New-CMDPGProxyConfig `
     -proxy_config $proxy_config `
     -api_url '/api/fakebank/accounts/{id}' `
-    -json_response_get_tokens $json_response_get_tokens
+    -json_response_get_tokens $json_response_get_tokens_accounts
+$proxy_config = New-CMDPGProxyConfig `
+    -proxy_config $proxy_config `
+    -api_url '/api/fakebank/details/{id}' `
+    -json_response_get_tokens $json_response_get_tokens_details
 #Write-HashtableArray $proxy_config -DEBUG
 Write-Output "---Done"
 
+Write-Output "...Done"
+
+
+###Creating DPG Policy
+#This is the interesting step...defining DPG policies for the API endpoints
+Write-Output "Creating DPG Policy for CC use case..."
 #Create DPG Policy
-Write-Output "---Creating DPG Policy..."
+Write-Output "---Creating DPG Policy for CC use case..."
 $dpgPolicyId = New-CMDPGPolicy `
     -name "cc_policy-$counter"  `
     -description 'DPG policy for credit card attributes' `
     -proxy_config $proxy_config
 ###Done Creating DPG Policy
 Write-Output "---Done"
-
 Write-Output "...Done"
 
 ###Creating Application Profile
@@ -303,8 +351,8 @@ Write-Output "Creating client profile..."
 $regToken = New-CMClientProfiles `
     -name "CC_profile-$counter" `
     -nae_iface_port  $nae_port `
-    -app_connector_type DPG `
-    -policy_id $dpgPolicyId `
+    -app_connector_type [CipherTrustManager.CM_Connectors]::DPG `
+    -id $dpgPolicyId `
     -lifetime '30d' `
     -cert_duration 730 `
     -max_clients 200 `
@@ -318,45 +366,6 @@ $regToken = New-CMClientProfiles `
 ###Done Creating Application Profile
 Write-Output "...Done"
 
-###Creating Users
-#ohhh...this one is the final step...adding few users
-Write-Output "Creating sample users..."
-#ccaccountowner, cccustomersupport, everyoneelse --- password is same for all...KeySecure01!
-
-Write-Output "---Creating Account Owner..."
-$pssword = ConvertTo-SecureString 'KeySecure01!' -AsPlainText
-$Cred = New-Object System.Management.Automation.PSCredential ("ccaccountowner", $pssword)
-New-CMUser `
-    -email 'ccaccountowner@local' `
-    -name 'ccaccountowner' `
-    -ps_creds  $Cred `
-    -app_metadata @{} `
-    -user_metadata @{}
-Write-Output "---Done"
-
-Write-Output "---Creating Customer Support..."
-$pssword = ConvertTo-SecureString 'KeySecure01!' -AsPlainText
-New-CMUser `
-    -email 'cccustomersupport@local' `
-    -name 'cccustomersupport' `
-    -username 'cccustomersupport' `
-    -secure_password  $pssword `
-    -app_metadata @{} `
-    -user_metadata @{}
-Write-Output "---Done"
-
-Write-Output "---Creating 'Everyone Else'..."
-New-CMUser `
-    -email 'everyoneelse@local' `
-    -name 'everyoneelse' `
-    -username 'everyoneelse' `
-    -password 'KeySecure01!' `
-    -app_metadata @{} `
-    -user_metadata @{}
-Write-Output "---Done"
-
-###Done Creating Users
-Write-Output "...Done"
 
 
 ###Create Docker setup

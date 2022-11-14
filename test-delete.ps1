@@ -9,7 +9,7 @@ $DebugPreference = 'SilentlyContinue'
 
 $username = "admin"
 $password = "P4ssw0rd!"
-$kms = "192.168.136.130"
+$kms = "192.168.136.131"
 $counter = "demo1"
 $keyname = "dpgKey-$counter"
 
@@ -28,46 +28,16 @@ Connect-CipherTrustManager `
     -pass $password
 Write-Output "...Done"
 
-
-
-###Deleting Users
-Write-Output "Deleting Sample Users..."
-#ccaccountowner, cccustomersupport, everyoneelse --- password is same for all...KeySecure01!
-$userList = Find-CMUsers `
-    -email 'everyoneelse@local'
-if ($userList.total -eq 1) {
-    Remove-CMUser `
-        -user_id $userList.resources[0].user_id
-}
-
-$userList = Find-CMUsers `
-    -email 'cccustomersupport@local'
-if ($userList.total -eq 1) {
-    Remove-CMUser `
-        -user_id $userList.resources[0].user_id
-}
-
-$userList = Find-CMUsers `
-    -email 'ccaccountowner@local'
-if ($userList.total -eq 1) {
-    Remove-CMUser `
-        -user_id $userList.resources[0].user_id
-}
-Write-Output "...Done"
-###Done Deleting Users
-
-
 ###Deleting Application Profile
 Write-Output "Deleting Client Profile..."
 $appList = Find-CMClientProfiles `
     -name "CC_profile-$counter"
 if ($appList.total -eq 1) {
     Remove-CMClientProfiles `
-        -app_id $appList.resources[0].id
+        -id $appList.resources[0].id
 }
 Write-Output "...Done"
 ###Done Deleting Application Profile
-
 
 #Deleting DPG Policies (I think is automatic when app dies)
 Write-Output "Deleting DPG Policy..."
@@ -75,19 +45,30 @@ $DPG_PolicyList = Find-CMDPGPolicies `
     -name "cc_policy-$counter"
 if ($DPG_PolicyList.total -eq 1) {
     Remove-CMDPGPolicy `
-        -policy_id $DPG_PolicyList.resources[0].id
+        -id $DPG_PolicyList.resources[0].id
 }
 Write-Output "...Done"
 ###Done Deleting DPG Policy
 
 ###Deleting Access Policies
 Write-Output "Deleting Access Policy..."
+Write-Output "---Deleting Access Policy for for credit card user set..."
 $AccessPolicyList = Find-CMAccessPolicies `
-    -name "cc_access_policy-$counter"
+    -name "last_four_show_access_policy-$counter"
 if ($AccessPolicyList.total -eq 1) {
     Remove-CMAccessPolicy `
-        -policy_id $AccessPolicyList.resources[0].id
+        -id $AccessPolicyList.resources[0].id
 }
+Write-Output "---Done"
+
+Write-Output "---Deleting Access Policy for for cvv user set..."
+$AccessPolicyList = Find-CMAccessPolicies `
+    -name "all_enc_access_policy-$counter"
+if ($AccessPolicyList.total -eq 1) {
+    Remove-CMAccessPolicy `
+        -id $AccessPolicyList.resources[0].id
+}
+Write-Output "---Done"
 Write-Output "...Done"
 ###Done Deleting Access Policies
 
@@ -97,7 +78,7 @@ $MaskingFormatList = Find-CMMaskingFormats `
     -name "cc_masking_format-$counter"
 if ($MaskingFormatList.total -eq 1) {
     Remove-CMMaskingFormat `
-        -mask_id $MaskingFormatList.resources[0].id
+        -id $MaskingFormatList.resources[0].id
 }
 Write-Output "...Done"
 #Done Deleting Masking Policy
@@ -108,31 +89,48 @@ $userList = Find-CMUserSets  `
     -name "enctextuserset-$counter"
 if ($userList.total -eq 1) {
     Remove-CMUserSet `
-        -userset_id $userList.resources[0].id
+        -id $userList.resources[0].id
 }
 $userList = Find-CMUserSets  `
     -name "maskedtextuserset-$counter"
 if ($userList.total -eq 1) {
     Remove-CMUserSet `
-        -userset_id $userList.resources[0].id
+        -id $userList.resources[0].id
 }
 $userList = Find-CMUserSets  `
     -name "plainttextuserset-$counter"
 if ($userList.total -eq 1) {
     Remove-CMUserSet `
-        -userset_id $userList.resources[0].id
+        -id $userList.resources[0].id
 }
 Write-Output "...Done"
 #Done Deleting User Sets
 
+###Creating Users
+Write-Output "Deleting sample users..."
+#ccaccountowner, cccustomersupport, everyoneelse, user1, user2, user3 --- password is same for all...KeySecure01!
+$users = "ccaccountowner", "cccustomersupport", "everyoneelse", "user1", "user2", "user3"
+foreach ($user in $users) {
+    Write-Output "---Deleting account for $user..."
+    $userList = Find-CMUsers `
+        -email "$($user)@local"
+    if ($userList.total -eq 1) {
+        Remove-CMUser `
+            -id $userList.resources[0].user_id
+    }
+    Write-Output "---Done"
+}
+###Done Creating Users
+Write-Output "...Done"
+
 #Deleting Protection Policies
 Write-Output "Deleting Protection Policies"
+#Remove-CMProtectionPolicy `
+#    -name "SSN_ProtectionPolicy-$counter"
 Remove-CMProtectionPolicy `
-    -policy_name "SSN_ProtectionPolicy-$counter"
+    -name "CC_ProtectionPolicy-$counter"
 Remove-CMProtectionPolicy `
-    -policy_name "CC_ProtectionPolicy-$counter"
-Remove-CMProtectionPolicy `
-    -policy_name "cvv_ProtectionPolicy-$counter"
+    -name "text_ProtectionPolicy-$counter"
 Write-Output "...Done"
 #Done Deleting Protection Policies
 
@@ -142,7 +140,7 @@ $charsetList = Find-CMCharacterSets `
     -name "DPGAlphaNum-$counter"
 if ($charsetList.total -eq 1) {
     Remove-CMCharacterSet `
-        -charset_id $charsetList.resources[0].id
+        -id $charsetList.resources[0].id
 }
 Write-Output "...Done"
 #Done Deleting Character Set
@@ -153,10 +151,10 @@ $interfaceList = Find-CMInterfaces `
     -name "nae_all_9005"
 if ($interfaceList.total -eq 1) {
     #    Remove-CMInterface `
-    #        -interface_id $interfaceList.resources[0].id
+    #        -id $interfaceList.resources[0].id
     #Looks like it wants NAME and not ID ... WHA???
     Remove-CMInterface `
-        -interface_name "nae_all_9005"
+        -name "nae_all_9005"
 }
 Write-Output "...Done"
 #Done Deleting an NAE network interface
@@ -164,10 +162,10 @@ Write-Output "...Done"
 #Deleting a key
 Write-Output "Deleting Keys"
 $keyList = Find-CMKeys  `
-    -keyname $keyname
+    -name $keyname
 if ($keyList.total -eq 1) {
     Remove-CMKey `
-        -key_id $keyList.resources[0].id
+        -id $keyList.resources[0].id
 }
 else {
     Write-Output "$($keyname) not found"
