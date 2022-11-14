@@ -30,6 +30,12 @@ Connect-CipherTrustManager `
     -user $username `
     -pass $password
 
+#Getting user id of local|admin
+$userList = Find-CMUsers -name "admin"
+$ownerID = $userList.resources[0].user_id
+
+
+
 #Create a key (need to get an owner... so WHO should own this key)
 Write-Output "Creating a Key"
 $keySuccess = New-CMKey  `
@@ -37,8 +43,7 @@ $keySuccess = New-CMKey  `
     -usageMask $usageMask `
     -algorithm $algorithm `
     -size $size `
-    -ownerId 'local|312c1485-aa03-454c-8591-6bd41509d846' `
-    -NoVersionedKey = $false
+    -ownerId $ownerID
 if (-NOT $keySuccess) {
     Write-Output "Key already created"
 }
@@ -118,16 +123,14 @@ Write-Output "...Done"
 Write-Output "Creating sample users..."
 #ccaccountowner, cccustomersupport, everyoneelse, user1, user2, user3 --- password is same for all...KeySecure01!
 $pssword = ConvertTo-SecureString 'KeySecure01!' -AsPlainText
-$Cred = New-Object System.Management.Automation.PSCredential ("ccaccountowner", $pssword)
-$users = "ccaccountowner","cccustomersupport","everyoneelse","user1","user2","user3"
-foreach ($user in $users){
+$users = @("ccaccountowner", "cccustomersupport", "everyoneelse", "user1", "user2", "user3")
+foreach ($user in $users) {
     Write-Output "---Creating account for $user..."
+    $Cred = New-Object System.Management.Automation.PSCredential ($user, $pssword)
     New-CMUser `
         -email "$($user)@local" `
         -name $user `
-        -ps_creds  $Cred `
-        -app_metadata @{} `
-        -user_metadata @{}
+        -ps_creds  $Cred    
     Write-Output "---Done"
 }
 ###Done Creating Users
