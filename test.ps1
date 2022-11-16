@@ -1,9 +1,10 @@
 ###
 #Demo Script
 ###
+using module CipherTrustManager
 
 Import-Module -Name powershell-yaml -Force
-Import-Module CipherTrustManager -Force -ErrorAction Stop
+#Import-Module CipherTrustManager -Force -ErrorAction Stop
 
 $DebugPreference = 'SilentlyContinue'
 #$DebugPreference = 'Continue'
@@ -283,13 +284,13 @@ $json_response_get_tokens_accounts = New-CMDPGJSONRequestResponse `
     -name 'accounts.[*].ccv' `
     -operation Reveal `
     -protection_policy "text_ProtectionPolicy-$counter" `
-    -access_policy "all_enc_access_policy-demo"
+    -access_policy "all_enc_access_policy-$counter"
 $json_response_get_tokens_accounts = New-CMDPGJSONRequestResponse `
     -json_tokens $json_response_get_tokens_accounts `
     -name 'accounts.[*].ccNumber' `
     -operation Reveal `
     -protection_policy "CC_ProtectionPolicy-$counter" `
-    -access_policy "last_four_show_access_policy-demo"
+    -access_policy "last_four_show_access_policy-$counter"
 Write-Output "---Done"
 
 Write-Output "---Creating GET RESPONSE Endpoint configuration for 'api_url' = '/api/fakebank/details/{id}'..."
@@ -298,13 +299,13 @@ $json_response_get_tokens_details = New-CMDPGJSONRequestResponse `
     -name 'details.ssn' `
     -operation Reveal `
     -protection_policy "CC_ProtectionPolicy-$counter" `
-    -access_policy "all_enc_access_policy-demo"
+    -access_policy "last_four_show_access_policy-$counter"
 $json_response_get_tokens_details = New-CMDPGJSONRequestResponse `
     -json_tokens $json_response_get_tokens_details `
     -name 'details.dob' `
     -operation Reveal `
     -protection_policy "CC_ProtectionPolicy-$counter" `
-    -access_policy "last_four_show_access_policy-demo"
+    -access_policy "last_four_show_access_policy-$counter"
 Write-Output "---Done"
 
 #Set Proxy Config
@@ -317,10 +318,9 @@ $proxy_config = New-CMDPGProxyConfig `
     -proxy_config $proxy_config `
     -api_url '/api/fakebank/account/card' `
     -json_request_post_tokens $json_request_post_tokens_card
-#Write-HashtableArray $proxy_config -DEBUG
 Write-Output "---Done"
 
-Write-Output "---Creating Proxy Config for GET RESPONSE..."
+# Write-Output "---Creating Proxy Config for GET RESPONSE..."
 $proxy_config = New-CMDPGProxyConfig `
     -proxy_config $proxy_config `
     -api_url '/api/fakebank/accounts/{id}' `
@@ -329,11 +329,10 @@ $proxy_config = New-CMDPGProxyConfig `
     -proxy_config $proxy_config `
     -api_url '/api/fakebank/details/{id}' `
     -json_response_get_tokens $json_response_get_tokens_details
-#Write-HashtableArray $proxy_config -DEBUG
 Write-Output "---Done"
-
+Write-Output "---proxy_config:"
+Write-HashtableArray $proxy_config -DEBUG
 Write-Output "...Done"
-
 
 ###Creating DPG Policy
 #This is the interesting step...defining DPG policies for the API endpoints
@@ -344,6 +343,7 @@ $dpgPolicyId = New-CMDPGPolicy `
     -name "cc_policy-$counter"  `
     -description 'DPG policy for credit card attributes' `
     -proxy_config $proxy_config
+Write-Debug $dpgPolicyId -DEBUG
 ###Done Creating DPG Policy
 Write-Output "---Done"
 Write-Output "...Done"
@@ -354,8 +354,8 @@ Write-Output "Creating client profile..."
 $regToken = New-CMClientProfiles `
     -name "CC_profile-$counter" `
     -nae_iface_port  $nae_port `
-    -app_connector_type [CipherTrustManager.CM_Connectors]::DPG `
-    -id $dpgPolicyId `
+    -app_connector_type DPG `
+    -policy_id $dpgPolicyId `
     -lifetime '30d' `
     -cert_duration 730 `
     -max_clients 200 `
