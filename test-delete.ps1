@@ -1,8 +1,7 @@
 ###
 #Undo Demo Script
-###T
-
-Import-Module CipherTrustManager -Force
+###
+using module CipherTrustManager
 
 $DebugPreference = 'SilentlyContinue'
 #$DebugPreference = 'Continue'
