@@ -44,7 +44,7 @@ export default function Login() {
   useEffect(() => {
     var nonAdminUsers = ["ccaccountowner", "user1", "user2", "user3"];
     let token = sessionStorage.getItem('token');
-    if(token !== null) {      
+    if(token !== null) {
       var decodedToken = jwt_decode(token);
       var dateNow = new Date();
       console.log(nonAdminUsers.indexOf(decodedToken.preferred_username))

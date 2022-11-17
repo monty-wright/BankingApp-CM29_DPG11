@@ -29,7 +29,10 @@ export default function UserDashboard() {
                 setSsn(res.data.details.ssn);
             }
           })
-          .catch((err) => console.log(err));
+          .catch((err) => {
+            console.log(err)
+            navigate('/auth/user/createFirst');
+          });
 
         axios
           .get('http://'+process.env.REACT_APP_BACKEND_IP_ADDRESS+':8081/api/proxy/accounts/'+decodedToken.preferred_username+'/'+ decodedToken.preferred_username)
