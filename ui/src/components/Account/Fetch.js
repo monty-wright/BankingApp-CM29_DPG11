@@ -18,7 +18,10 @@ export default function Fetch() {
 
   useEffect(() => {
     axios
-      .get('http://'+process.env.REACT_APP_BACKEND_IP_ADDRESS+':8081/api/proxy/account/details/'+userQuery)
+      .get('http://'+process.env.REACT_APP_BACKEND_IP_ADDRESS+':8081/api/proxy/account/details/'+userQuery,
+      {}, {
+        headers: { 'Authorization': + sessionStorage.getItem('basic') }
+      })
       .then((res) => {
         console.log(res.data.details);
         setFullName(res.data.details.name);
@@ -32,7 +35,9 @@ export default function Fetch() {
       .get('http://'+process.env.REACT_APP_BACKEND_IP_ADDRESS+':8081/api/proxy/accounts/'+
         decodedToken.preferred_username+
         '/'+ 
-        userQuery)
+        userQuery, {}, {
+            headers: { 'Authorization': + sessionStorage.getItem('basic') }
+        })
       .then((res) => {
         setAccounts(res.data.accounts);
       })

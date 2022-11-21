@@ -17,7 +17,11 @@ export default function UserDashboard() {
 
     useEffect(() => {
         axios
-          .get('http://'+process.env.REACT_APP_BACKEND_IP_ADDRESS+':8081/api/proxy/account/details/'+decodedToken.preferred_username)
+          .get(
+            'http://'+process.env.REACT_APP_BACKEND_IP_ADDRESS+':8081/api/proxy/account/details/'+decodedToken.preferred_username,
+            {}, {
+                headers: { 'Authorization': + sessionStorage.getItem('basic') }
+            })
           .then((res) => {
             console.log(res.data.details);
             if(res.data.details.ssn === null) {
@@ -35,7 +39,11 @@ export default function UserDashboard() {
           });
 
         axios
-          .get('http://'+process.env.REACT_APP_BACKEND_IP_ADDRESS+':8081/api/proxy/accounts/'+decodedToken.preferred_username+'/'+ decodedToken.preferred_username)
+          .get(
+            'http://'+process.env.REACT_APP_BACKEND_IP_ADDRESS+':8081/api/proxy/accounts/'+decodedToken.preferred_username+'/'+ decodedToken.preferred_username,
+            {}, {
+                headers: { 'Authorization': + sessionStorage.getItem('basic') }
+            })
           .then((res) => {
             setAccounts(res.data.accounts);
           })

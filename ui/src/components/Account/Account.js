@@ -11,7 +11,11 @@ function Account() {
   useEffect(() => {
     console.log(decodedToken.preferred_username);
     axios
-      .get('http://'+process.env.REACT_APP_BACKEND_IP_ADDRESS+':8081/api/proxy/accounts/'+decodedToken.preferred_username+'/'+ decodedToken.preferred_username)
+      .get(
+        'http://'+process.env.REACT_APP_BACKEND_IP_ADDRESS+':8081/api/proxy/accounts/'+decodedToken.preferred_username+'/'+ decodedToken.preferred_username,
+        {}, {
+          headers: { 'Authorization': + sessionStorage.getItem('basic') }
+        })
       .then((res) => {
         setAccounts(res.data.accounts);
       })

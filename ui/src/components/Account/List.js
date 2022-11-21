@@ -11,7 +11,9 @@ export default function Fetch() {
 
     useEffect(() => {
         axios
-          .get('http://'+process.env.REACT_APP_BACKEND_IP_ADDRESS+':8081/api/proxy/accounts/all/'+decodedToken.preferred_username)
+          .get('http://'+process.env.REACT_APP_BACKEND_IP_ADDRESS+':8081/api/proxy/accounts/all/'+decodedToken.preferred_username, {}, {
+            headers: { 'Authorization': + sessionStorage.getItem('basic') }
+          })
           .then((res) => {
             console.log(res.data.accounts);
             setAccounts(res.data.accounts);

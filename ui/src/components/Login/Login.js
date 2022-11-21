@@ -28,7 +28,8 @@ export default function Login() {
       username,
       password
     });
-    sessionStorage.setItem('token',auth_response.jwt);
+    sessionStorage.setItem('token', auth_response.jwt);
+    sessionStorage.setItem('basic', btoa(username + ':' + password))
     let token = sessionStorage.getItem('token');
     var decodedToken = jwt_decode(token);
     console.log(nonAdminUsers.indexOf(decodedToken.preferred_username))
@@ -62,7 +63,7 @@ export default function Login() {
       console.log('continue...');
     }
     
-  }, []);
+  }, [navigate]);
 
   return(
     <div className="Auth-form-container">

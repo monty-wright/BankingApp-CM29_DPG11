@@ -5,7 +5,6 @@ package com.fakebank.proxy.controller;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Base64;
 import java.util.Calendar;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -20,6 +19,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
@@ -45,7 +45,9 @@ public class CCAccountController {
 	private RestTemplate restTemplate;
 	
 	@CrossOrigin(origins = "*")
-	@PostMapping(value = "/api/proxy/account/details", produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(
+			value = "/api/proxy/account/details", 
+			produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public ApiResponseBean saveAccountDetails(@RequestBody AccountDetailsUpdateRequestBean bean) {
 		CustomerPersonalDetails acc = new CustomerPersonalDetails();
@@ -68,7 +70,9 @@ public class CCAccountController {
 	
 	
 	@CrossOrigin(origins = "*")
-	@PostMapping(value = "/api/proxy/account/card", produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(
+			value = "/api/proxy/account/card", 
+			produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public ApiResponseBean saveNewCard(@RequestBody NewCardRequestBean bean) {
 		NewCreditCardBean newCard = new NewCreditCardBean();
@@ -98,11 +102,22 @@ public class CCAccountController {
 	}
 	
 	@CrossOrigin(origins = "*")
-	@GetMapping(value = "/api/proxy/account/details/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(
+			value = "/api/proxy/account/details/{id}", 
+			produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseBody
-	public CustomerPersonalDetails getAccountDetails(@PathVariable("id") String id) {
+	public CustomerPersonalDetails getAccountDetails(
+			@PathVariable("id") String id,
+			@RequestHeader(HttpHeaders.AUTHORIZATION) String header) {
 		String dockerUri = "http://ciphertrust:9005/api/fakebank/account/personal/" + id;
-		ResponseEntity<CustomerPersonalDetails> response = restTemplate.getForEntity(dockerUri, CustomerPersonalDetails.class);
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Authorization", header);
+		HttpEntity<String> request = new HttpEntity<String>(headers);
+		ResponseEntity<CustomerPersonalDetails> response = restTemplate.exchange(
+				dockerUri, 
+				HttpMethod.GET,
+				request,
+				CustomerPersonalDetails.class);
 		
 		return response.getBody();
 	}
@@ -111,18 +126,20 @@ public class CCAccountController {
 	@GetMapping("/api/proxy/accounts/{requestor}/{account}")
 	public CustomerCreditAccounts getAccountsById(
 			@PathVariable("requestor") String requestor,
-			@PathVariable("account") String accountId) {
+			@PathVariable("account") String accountId,
+			@RequestHeader(HttpHeaders.AUTHORIZATION) String header) {
 		String dockerUri = "http://ciphertrust:9005/api/fakebank/accounts/"+accountId;
-		
-		String plainCreds = requestor + ":KeySecure01!";
+		HttpHeaders headers = new HttpHeaders();
+		/*String plainCreds = requestor + ":KeySecure01!";
 		byte[] plainCredsBytes = plainCreds.getBytes();
 		byte[] base64CredsBytes = Base64.getEncoder().encode(plainCredsBytes);
-		String base64Creds = new String(base64CredsBytes);
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("Authorization", "Basic " + base64Creds);
+		String base64Creds = new String(base64CredsBytes);		
+		headers.add("Authorization", "Basic " + base64Creds);*/
+		headers.add("Authorization", header);
 		HttpEntity<String> request = new HttpEntity<String>(headers);
 		
-		ResponseEntity<CustomerCreditAccounts> fetchResponse = restTemplate.exchange(dockerUri, 
+		ResponseEntity<CustomerCreditAccounts> fetchResponse = restTemplate.exchange(
+				dockerUri, 
 				HttpMethod.GET, 
 				request, 
 				CustomerCreditAccounts.class);
@@ -131,15 +148,18 @@ public class CCAccountController {
 	
 	@CrossOrigin(origins = "*")
 	@GetMapping("/api/proxy/accounts/all/{requestor}")
-	public CustomerPersonalAccounts getAllAccountHolders(@PathVariable("requestor") String requestor) {
+	public CustomerPersonalAccounts getAllAccountHolders(
+			@PathVariable("requestor") String requestor,
+			@RequestHeader(HttpHeaders.AUTHORIZATION) String header) {
 		String dockerUri = "http://ciphertrust:9005/api/fakebank/account/holders";
+		HttpHeaders headers = new HttpHeaders();
 		
-		String plainCreds = requestor + ":KeySecure01!";
+		/*String plainCreds = requestor + ":KeySecure01!";
 		byte[] plainCredsBytes = plainCreds.getBytes();
 		byte[] base64CredsBytes = Base64.getEncoder().encode(plainCredsBytes);
 		String base64Creds = new String(base64CredsBytes);
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("Authorization", "Basic " + base64Creds);
+		headers.add("Authorization", "Basic " + base64Creds);*/
+		headers.add("Authorization", header);
 		HttpEntity<String> request = new HttpEntity<String>(headers);
 		
 		ResponseEntity<CustomerPersonalAccounts> fetchResponse = restTemplate.exchange(

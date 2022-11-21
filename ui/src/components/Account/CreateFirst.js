@@ -8,7 +8,8 @@ async function createAccountDetails(AccDetails) {
     return fetch('http://'+process.env.REACT_APP_BACKEND_IP_ADDRESS+':8081/api/proxy/account/details', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': + sessionStorage.getItem('basic')
       },
       body: JSON.stringify(AccDetails)
     }).then(data => data.json())
@@ -17,7 +18,8 @@ async function createAccountCard(AccDetails) {
     return fetch('http://'+process.env.REACT_APP_BACKEND_IP_ADDRESS+':8081/api/proxy/account/card', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': + sessionStorage.getItem('basic')
       },
       body: JSON.stringify(AccDetails)
     }).then(data => data.json())
