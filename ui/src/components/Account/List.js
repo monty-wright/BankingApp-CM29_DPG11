@@ -10,7 +10,7 @@ export default function Fetch() {
     var decodedToken = jwt_decode(token);
 
     useEffect(() => {
-      const headers = { Authorization: `Bearer ${sessionStorage.getItem('basic')}` };
+      const headers = { Authorization: `Basic ${sessionStorage.getItem('basic')}` };
       axios
         .get('http://'+process.env.REACT_APP_BACKEND_IP_ADDRESS+':8081/api/proxy/accounts/all/'+decodedToken.preferred_username, {
           headers: headers
