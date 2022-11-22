@@ -5,7 +5,6 @@ package com.fakebank.proxy.controller;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Base64;
 import java.util.Calendar;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -131,13 +130,6 @@ public class CCAccountController {
 			@RequestHeader(HttpHeaders.AUTHORIZATION) String header) {
 		String dockerUri = "http://ciphertrust:9005/api/fakebank/accounts/"+accountId;
 		HttpHeaders headers = new HttpHeaders();
-		String plainCreds = requestor + ":KeySecure01!";
-		byte[] plainCredsBytes = plainCreds.getBytes();
-		byte[] base64CredsBytes = Base64.getEncoder().encode(plainCredsBytes);
-		String base64Creds = new String(base64CredsBytes);		
-		//headers.add("Authorization", "Basic " + base64Creds);*/
-		System.out.println("header from react: " + header);
-		System.out.println("header from spring boot: " + "Basic " + base64Creds);
 		headers.add("Authorization", header);
 		HttpEntity<String> request = new HttpEntity<String>(headers);
 		
