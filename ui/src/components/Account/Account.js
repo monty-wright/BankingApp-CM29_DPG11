@@ -9,19 +9,17 @@ function Account() {
   var decodedToken = jwt_decode(token);
 
   useEffect(() => {
-    console.log(decodedToken.preferred_username);
+    const headers = { Authorization: `Bearer ${sessionStorage.getItem('basic')}` };
     axios
       .get(
         'http://'+process.env.REACT_APP_BACKEND_IP_ADDRESS+':8081/api/proxy/accounts/'+decodedToken.preferred_username+'/'+ decodedToken.preferred_username,
-        {}, {
-          headers: { 'Authorization': + sessionStorage.getItem('basic') }
+        {
+          headers: headers
         })
       .then((res) => {
         setAccounts(res.data.accounts);
       })
       .catch((err) => console.log(err));
-      //data = {"userName":"ccaccountowner","accounts":[{"expDate":"12/04/2025","ccNumber":"2000101000100730-2184-1768-3759","cvv":"373","friendlyName":"Walmart MC","balance":"0"},{"expDate":"12/04/2025","ccNumber":"2000101000100730-2184-1768-3759","cvv":"373","friendlyName":"Costco MC","balance":"0"}]}
-      //setAccounts(data.accounts);
     }, []);
   
   const cards = {};

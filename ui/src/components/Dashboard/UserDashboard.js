@@ -16,11 +16,12 @@ export default function UserDashboard() {
     const [accounts, setAccounts] = useState("");
 
     useEffect(() => {
+        const headers = { Authorization: `Bearer ${sessionStorage.getItem('basic')}` };
         axios
           .get(
             'http://'+process.env.REACT_APP_BACKEND_IP_ADDRESS+':8081/api/proxy/account/details/'+decodedToken.preferred_username,
-            {}, {
-                headers: { 'Authorization': + sessionStorage.getItem('basic') }
+            {
+                headers: headers
             })
           .then((res) => {
             console.log(res.data.details);
@@ -41,8 +42,8 @@ export default function UserDashboard() {
         axios
           .get(
             'http://'+process.env.REACT_APP_BACKEND_IP_ADDRESS+':8081/api/proxy/accounts/'+decodedToken.preferred_username+'/'+ decodedToken.preferred_username,
-            {}, {
-                headers: { 'Authorization': + sessionStorage.getItem('basic') }
+            {
+                headers: headers
             })
           .then((res) => {
             setAccounts(res.data.accounts);

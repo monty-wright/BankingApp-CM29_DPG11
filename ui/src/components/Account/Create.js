@@ -6,8 +6,7 @@ async function createAccount(AccDetails) {
     return fetch('http://'+process.env.REACT_APP_BACKEND_IP_ADDRESS+':8081/api/proxy/account/card', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': + sessionStorage.getItem('basic')
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify(AccDetails)
     }).then(data => data.json())
