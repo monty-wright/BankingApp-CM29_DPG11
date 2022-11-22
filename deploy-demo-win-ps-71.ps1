@@ -94,6 +94,7 @@ $body = @{
     'tweak' = '1628462495815733'
     'tweak_algorithm' = 'SHA1'
     'algorithm' = 'FPE/FF3/ASCII'
+    'character_set_id' = $charSetId
 }
 $jsonBody = $body | ConvertTo-Json -Depth 5
 $response = Invoke-RestMethod -SkipCertificateCheck -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
@@ -109,7 +110,6 @@ $body = @{
     'tweak_algorithm' = 'SHA1'
     'algorithm' = 'FPE/AES/CARD10'
     'allow_single_char_input' = $false
-    'character_set_id' = $charSetId
 }
 $jsonBody = $body | ConvertTo-Json -Depth 5
 $response = Invoke-RestMethod -SkipCertificateCheck -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'

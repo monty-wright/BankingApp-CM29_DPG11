@@ -56,7 +56,7 @@ public class ThalesCMAuthController {
 		
 		//Add User to CM
 		//Get CM IP and credentials from system environment - passed via docker invocation
-		String cmUrl = System.getenv("CM_IP");
+		String cmUrl = System.getenv("CMIP");
 		String cmUser = System.getenv("CM_USERNAME");
 		String cmUserPwd = System.getenv("CM_PASSWORD");
 		String cmUserSetId = System.getenv("CM_USER_SET_ID");

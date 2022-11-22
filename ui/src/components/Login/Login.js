@@ -86,7 +86,7 @@ export default function Login() {
             </button>
           </div>
           <p className="forgot-password text-right mt-2">
-            Forgot password?
+            <a href="/userCreate">Register</a>
           </p>
         </div>
       </form>
