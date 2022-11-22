@@ -301,6 +301,28 @@ $body = @{
                     'access_policy' = "last_four_show_access_policy-$counter"
                 }
             )
+        },
+        @{
+            'api_url' = '/api/user-mgmt/user/create'
+            'json_request_post_tokens' = @(
+                @{
+                    'name' = 'personal.ssn'
+                    'operation' = 'protect'
+                    'protection_policy' = "text_ProtectionPolicy-$counter"
+                },@{
+                    'name' = 'personal.dob'
+                    'operation' = 'protect'
+                    'protection_policy' = "text_ProtectionPolicy-$counter"
+                },@{
+                    'name' = 'card.ccNumber'
+                    'operation' = 'protect'
+                    'protection_policy' = "CC_ProtectionPolicy-$counter"
+                },@{
+                    'name' = 'card.cvv'
+                    'operation' = 'protect'
+                    'protection_policy' = "text_ProtectionPolicy-$counter"
+                }
+            )
         }
     )
 }
