@@ -25,6 +25,10 @@ $headers = @{
     Authorization="Bearer $jwt"
 }
 
+$url = "https://$kms/api/v1/auth/self/user"
+$response = Invoke-RestMethod -SkipCertificateCheck -Method 'Get' -Uri $url -Headers $headers -ContentType 'application/json'
+$userID = $response.user_id
+
 #Create DPG Key
 Write-Output "Creating DPG Key"
 $url = "https://$kms/api/v1/vault/keys2"
@@ -36,7 +40,7 @@ $body = @{
     'unexportable' = $false
     'undeletable' = $false
     'meta' = @{
-        'ownerId' = 'local|312c1485-aa03-454c-8591-6bd41509d846'
+        'ownerId' = $userID
         'versionedKey' = $true
     }
 }
@@ -90,7 +94,6 @@ $body = @{
     'tweak' = '1628462495815733'
     'tweak_algorithm' = 'SHA1'
     'algorithm' = 'FPE/FF3/ASCII'
-    'character_set_id' = $charSetId
 }
 $jsonBody = $body | ConvertTo-Json -Depth 5
 $response = Invoke-RestMethod -SkipCertificateCheck -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
@@ -111,22 +114,6 @@ $body = @{
 $jsonBody = $body | ConvertTo-Json -Depth 5
 $response = Invoke-RestMethod -SkipCertificateCheck -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
 $ccPolicyId = $response.id
-
-#Creating SSN Protection Policy
-#Write-Output "Creating Protection Policy for SSN..."
-#$url = "https://$kms/api/v1/data-protection/protection-policies"
-#$body = @{
-#    'name' = "SSN_ProtectionPolicy-$counter"
-#    'key' = "dpgKey-$counter"
-#    'tweak' = '1628462495815733'
-#    'tweak_algorithm' = 'SHA1'
-#    'algorithm' = 'FPE/FF1v2/UNICODE'
-#    'character_set_id' = $charSetId
-#    'allow_single_char_input' = $false
-#}
-#$jsonBody = $body | ConvertTo-Json -Depth 5
-#$response = Invoke-RestMethod -SkipCertificateCheck -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
-#$ssnPolicyId = $response.id
 
 Write-Output "Creating sample users..."
 #ccaccountowner, cccustomersupport, everyoneelse --- password is same for all...KeySecure01!
@@ -300,17 +287,17 @@ $body = @{
             )
         },
         @{
-            'api_url' = '/api/fakebank/details/{id}'
+            'api_url' = '/api/fakebank/account/personal/{id}'
             'json_response_get_tokens' = @(
                 @{
                     'name' = 'details.ssn'
                     'operation' = 'reveal'
-                    'protection_policy' = "CC_ProtectionPolicy-$counter"
+                    'protection_policy' = "text_ProtectionPolicy-$counter"
                     'access_policy' = "last_four_show_access_policy-$counter"
                 },@{
                     'name' = 'details.dob'
                     'operation' = 'reveal'
-                    'protection_policy' = "CC_ProtectionPolicy-$counter"
+                    'protection_policy' = "text_ProtectionPolicy-$counter"
                     'access_policy' = "last_four_show_access_policy-$counter"
                 }
             )
@@ -371,7 +358,10 @@ $yamlObj.services.ciphertrust.environment = @(
     "DPG_PORT=9005"
 )
 $yamlObj.services.api.environment = @(
-    "CMIP=https://$kms"
+    "CMIP=https://$kms",
+	"CM_USERNAME=$username",
+	"CM_PASSWORD=$password",
+	"CM_USER_SET_ID=$plainTextUserSetId"
 )
 
 $yaml = ConvertTo-YAML $yamlObj | yq

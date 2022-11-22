@@ -13,6 +13,7 @@ import List from './components/Account/List';
 import My from './components/Account/My';
 import UserDashboard from './components/Dashboard/UserDashboard';
 import CreateFirst from './components/Account/CreateFirst';
+import UserCreate from './components/Login/UserCreate';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
           <Route exact path="/" element={<Login />} />
           <Route path='/login' element={<Login />} />
           <Route path='/logout' element={<Logout />} />
+          <Route path='/userCreate' element={<UserCreate />} />
           <Route path="/auth/user" element={<UserLayout />}>
             <Route exact path="home" element={<UserDashboard />} />
             <Route path="myAccount" element={<My />} />

@@ -30,6 +30,9 @@ services:
   api:
     environment:
       - CMIP: GENERATED_BY_POWERSHELL
+      - CM_USERNAME: GENERATED_BY_POWERSHELL
+      - CM_PASSWORD: GENERATED_BY_POWERSHELL
+      - CM_USER_SET_ID: GENERATED_BY_POWERSHELL
     container_name: api
     build:
       dockerfile: Dockerfile

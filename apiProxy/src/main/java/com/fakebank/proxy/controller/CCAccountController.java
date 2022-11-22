@@ -30,6 +30,7 @@ import com.fakebank.proxy.bean.CustomerAccountPersonal;
 import com.fakebank.proxy.bean.CustomerCreditAccounts;
 import com.fakebank.proxy.bean.CustomerPersonalAccounts;
 import com.fakebank.proxy.bean.CustomerPersonalDetails;
+import com.fakebank.proxy.bean.NewAccountBean;
 import com.fakebank.proxy.bean.NewCardRequestBean;
 import com.fakebank.proxy.bean.NewCreditCardBean;
 
@@ -43,6 +44,19 @@ public class CCAccountController {
 
 	@Autowired
 	private RestTemplate restTemplate;
+	
+	@CrossOrigin(origins = "*")
+	@PostMapping(
+			value = "/api/proxy/account/create", 
+			produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public ApiResponseBean createAccount(@RequestBody NewAccountBean bean) {
+		
+		String dockerUri = "http://ciphertrust:9005/api/user-mgmt/user/create";
+		ApiResponseBean createResponse = restTemplate.postForObject(dockerUri, bean, ApiResponseBean.class);
+		
+		return createResponse;
+	}
 	
 	@CrossOrigin(origins = "*")
 	@PostMapping(
