@@ -271,10 +271,9 @@ function UserLayout() {
     let token = sessionStorage.getItem('token');
     var decodedToken = jwt_decode(token);
     var dateNow = new Date();
-    var nonAdminUsers = ["ccaccountowner", "user1", "user2", "user3"];
     let authToken = false;
 
-    if(token && (decodedToken.exp * 1000 > dateNow.getTime()) && (nonAdminUsers.indexOf(decodedToken.preferred_username) > -1)) {
+    if(token && (decodedToken.exp * 1000 > dateNow.getTime())) {
         authToken = true;
     } else {
         authToken = false;

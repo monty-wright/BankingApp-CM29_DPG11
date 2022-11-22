@@ -157,7 +157,7 @@ public class ThalesCMAuthController {
 		acc.setDob(bean.getPersonal().getDob());
 		acc.setMobile(bean.getPersonal().getMobileNumber());
 		acc.setName(bean.getPersonal().getFullName());
-		acc.setSsn(bean.getPersonal().getFullName());
+		acc.setSsn(bean.getPersonal().getSsn());
 		acc.setThalesId(responseUserCreate.get("user_id").asText());
 		userBean.setDetails(acc);
 		

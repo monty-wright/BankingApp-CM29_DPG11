@@ -31,7 +31,7 @@ export default function Login() {
     sessionStorage.setItem('basic', btoa(username + ':' + password))
     let token = sessionStorage.getItem('token');
     var decodedToken = jwt_decode(token);
-    if((decodedToken.preferred_username === 'cccustomersupport') ||(decodedToken.preferred_username === 'everyoneelse'))
+    if((decodedToken.preferred_username === 'cccustomersupport') || (decodedToken.preferred_username === 'everyoneelse'))
       navigate('/auth/admin/home');
     else
       navigate('/auth/user/home');
@@ -47,7 +47,7 @@ export default function Login() {
         if((decodedToken.preferred_username === 'cccustomersupport') || (decodedToken.preferred_username === 'everyoneelse'))
           navigate('/auth/admin/home');
         else
-        navigate('/auth/user/home');
+          navigate('/auth/user/home');
       } else {
         console.log('continue...');
       }

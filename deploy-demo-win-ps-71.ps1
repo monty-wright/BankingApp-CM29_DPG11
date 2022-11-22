@@ -93,7 +93,7 @@ $body = @{
     'key' = "dpgKey-$counter"
     'tweak' = '1628462495815733'
     'tweak_algorithm' = 'SHA1'
-    'algorithm' = 'FPE/FF3/ASCII'
+    'algorithm' = 'FPE/FF1v2/UNICODE'
     'character_set_id' = $charSetId
 }
 $jsonBody = $body | ConvertTo-Json -Depth 5
@@ -108,7 +108,7 @@ $body = @{
     'key' = "dpgKey-$counter"
     'tweak' = '9828462495846783'
     'tweak_algorithm' = 'SHA1'
-    'algorithm' = 'FPE/AES/CARD10'
+    'algorithm' = 'FPE/FF1v2/CARD10'
     'allow_single_char_input' = $false
 }
 $jsonBody = $body | ConvertTo-Json -Depth 5
