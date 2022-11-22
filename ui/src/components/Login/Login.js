@@ -58,38 +58,51 @@ export default function Login() {
   }, [navigate]);
 
   return(
-    <div className="Auth-form-container">
-      <form className="Auth-form" onSubmit={handleSubmit}>
-        <div className="Auth-form-content">
-          <h3 className="Auth-form-title">Sign In</h3>
-          <div className="form-group mt-3">
-            <label>Username</label>
-            <input
-              type="text"
-              className="form-control mt-1"
-              placeholder="Enter Username"
-              onChange={e => setUserName(e.target.value)}
-            />
-          </div>
-          <div className="form-group mt-3">
-            <label>Password</label>
-            <input
-              type="password"
-              className="form-control mt-1"
-              placeholder="Enter password"
-              onChange={e => setPassword(e.target.value)}
-            />
-          </div>
-          <div className="d-grid gap-2 mt-3">
-            <button type="submit" className="btn btn-primary">
-              Submit
-            </button>
-          </div>
-          <p className="forgot-password text-right mt-2">
-            <a href="/userCreate">Register</a>
-          </p>
+    <div className="bg-white dark:bg-gray-900">
+        <div className="flex justify-center h-screen">
+            <div className="hidden bg-cover lg:block lg:w-2/3 bg-[url('https://images.unsplash.com/photo-1537724326059-2ea20251b9c8?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1776&q=80')]">
+                <div className="flex items-center h-full px-20 bg-gray-900 bg-opacity-40">
+                    <div>
+                        <h2 className="text-4xl font-bold text-white">Secure Online Banking</h2>                        
+                        <p className="max-w-xl mt-3 text-gray-300">Compliant online banking with Ciphertrust Manager data protection solution</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex items-center w-full max-w-md px-6 mx-auto lg:w-2/6">
+                <div class="flex-1">
+                    <div class="text-center">
+                        <p class="mt-3 text-gray-500 dark:text-gray-300">Sign in to access your account</p>
+                    </div>
+
+                    <div class="mt-8">
+                        <form onSubmit={handleSubmit}>
+                            <div>
+                                <label for="email" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">Username</label>
+                                <input type="text" name="email" id="email" placeholder="username" class="block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-md dark:placeholder-gray-600 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 focus:border-blue-400 dark:focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40" onChange={e => setUserName(e.target.value)} />
+                            </div>
+
+                            <div class="mt-6">
+                                <div class="flex justify-between mb-2">
+                                    <label for="password" class="text-sm text-gray-600 dark:text-gray-200">Password</label>
+                                    <a href="#" class="text-sm text-gray-400 focus:text-blue-500 hover:text-blue-500 hover:underline">Forgot password?</a>
+                                </div>
+
+                                <input type="password" name="password" id="password" placeholder="Your Password" class="block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-md dark:placeholder-gray-600 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 focus:border-blue-400 dark:focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40" onChange={e => setPassword(e.target.value)} />
+                            </div>
+
+                            <div class="mt-6">
+                                <button
+                                    class="w-full px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-blue-500 rounded-md hover:bg-blue-400 focus:outline-none focus:bg-blue-400 focus:ring focus:ring-blue-300 focus:ring-opacity-50">
+                                    Sign in
+                                </button>
+                            </div>
+                        </form>
+                        <p class="mt-6 text-sm text-center text-gray-400">Don&#x27;t have an account yet? <a href="/userCreate" class="text-blue-500 focus:outline-none focus:underline hover:underline">Sign up</a>.</p>
+                    </div>
+                </div>
+            </div>
         </div>
-      </form>
     </div>
   )
 }

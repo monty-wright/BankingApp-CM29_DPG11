@@ -78,11 +78,12 @@ function UserLayout() {
                                                             />
                                                         </svg>
                                                     </div>
-                                                    <p className="text-gray-700 ml-3 text-lg">Accounts</p>
+                                                    
                                                 </div>
                                                 <div onClick={() => setProduct(!product)}>
                                                     {product ? (
                                                         <div className=" ml-4">
+                                                            <p className="text-gray-700 ml-3 text-lg">Accounts</p>
                                                             <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-chevron-up" width={14} height={14} viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
                                                                 <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                                                 <polyline points="6 15 12 9 18 15" />
@@ -90,6 +91,7 @@ function UserLayout() {
                                                         </div>
                                                     ) : (
                                                         <div className="ml-4">
+                                                            <p className="text-gray-700 ml-3 text-lg">Accounts</p>
                                                             <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-chevron-down" width={14} height={14} viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
                                                                 <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                                                                 <polyline points="6 9 12 15 18 9" />
@@ -183,12 +185,9 @@ function UserLayout() {
                                         ) : (
                                             ""
                                         )}
-                                        Accounts
+                                        
                                         <span className="ml-2" onClick={() => setProduct(!product)}>
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-chevron-down" width={16} height={16} viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
-                                                <path stroke="none" d="M0 0h24v24H0z" />
-                                                <polyline points="6 9 12 15 18 9" />
-                                            </svg>
+                                            Accounts
                                         </span>
                                     </li>
                                 </ul>
@@ -211,14 +210,9 @@ function UserLayout() {
                                         </div>
                                         <div aria-haspopup="true" className="cursor-pointer w-full flex items-center justify-end relative" onClick={() => setProfile(!profile)}>
                                             {profile ? (
-                                                <ul className="p-2 w-40 border-r bg-white absolute rounded z-40 left-0 shadow mt-64 ">
+                                                <ul className="p-2 w-40 border-r bg-white absolute rounded z-40 left-0 shadow mt-16 ">
                                                     <li className="cursor-pointer text-gray-600 text-sm leading-3 tracking-normal py-2 hover:text-indigo-700 focus:text-indigo-700 focus:outline-none">
                                                         <div className="flex items-center">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-user" width={20} height={20} viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
-                                                                <path stroke="none" d="M0 0h24v24H0z" />
-                                                                <circle cx={12} cy={7} r={4} />
-                                                                <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
-                                                            </svg>
                                                             <span className="ml-2"><a href="/logout" className="text-black hover:text-blue-800 visited:text-black no-underline">Logout</a></span>
                                                         </div>
                                                     </li>
