@@ -89,10 +89,10 @@ public class ThalesCMAuthController {
 		
 		//Create Request Object
 		CMCreateUserBean request = new CMCreateUserBean();
-		request.setEmail(bean.getUsername() + "@local");
+		request.setEmail(bean.getUserName() + "@local");
 		request.setName(bean.getPersonal().getFullName());
 		request.setPassword(bean.getPassword());
-		request.setUsername(bean.getUsername());
+		request.setUsername(bean.getUserName());
 		
 		HttpEntity<CMCreateUserBean> entity = new HttpEntity<CMCreateUserBean>(request,headers);
 		JsonNode responseUserCreate = null;
@@ -114,7 +114,7 @@ public class ThalesCMAuthController {
 		//Create Request Object
 		CMAddUsersToUserSetBean requestBean = new CMAddUsersToUserSetBean();
 		List<String> users = new ArrayList<String>();
-		users.add(bean.getUsername());
+		users.add(bean.getUserName());
 		requestBean.setUsers(users);
 		HttpEntity<CMAddUsersToUserSetBean> createUserEntity = new HttpEntity<CMAddUsersToUserSetBean>(requestBean,headers);
 		try {
@@ -136,7 +136,7 @@ public class ThalesCMAuthController {
         String createDate = dateFormat.format(c.getTime());
 		
         CustomerAccountMongoDocumentBean userBean = new CustomerAccountMongoDocumentBean();
-		userBean.setUserName(bean.getUsername());
+		userBean.setUserName(bean.getUserName());
 		userBean.setCreationDate(createDate);
 		
 		CustomerAccountCard card = new CustomerAccountCard();

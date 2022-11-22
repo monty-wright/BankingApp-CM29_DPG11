@@ -1,17 +1,17 @@
 package com.fakebank.dpg.bean;
 
 public class NewAccountBean {
-	private String username;
+	private String userName;
 	private String password;
 	private AccountDetailsUpdateRequestBean personal;
 	private ExistingCardBean card;
 
-	public String getUsername() {
-		return username;
+	public String getUserName() {
+		return userName;
 	}
 
-	public void setUsername(String username) {
-		this.username = username;
+	public void setUsername(String userName) {
+		this.userName = userName;
 	}
 
 	public String getPassword() {
@@ -43,10 +43,10 @@ public class NewAccountBean {
 		// TODO Auto-generated constructor stub
 	}
 
-	public NewAccountBean(String username, String password, AccountDetailsUpdateRequestBean personal,
+	public NewAccountBean(String userName, String password, AccountDetailsUpdateRequestBean personal,
 			ExistingCardBean card) {
 		super();
-		this.username = username;
+		this.userName = userName;
 		this.password = password;
 		this.personal = personal;
 		this.card = card;
@@ -54,7 +54,7 @@ public class NewAccountBean {
 
 	@Override
 	public String toString() {
-		return "NewAccountBean [username=" + username + ", password=" + password + ", personal=" + personal + ", card="
+		return "NewAccountBean [userName=" + userName + ", password=" + password + ", personal=" + personal + ", card="
 				+ card + "]";
 	}
 }
