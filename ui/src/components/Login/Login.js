@@ -60,7 +60,7 @@ export default function Login() {
   return(
     <div className="bg-white dark:bg-gray-900">
         <div className="flex justify-center h-screen">
-            <div className="hidden bg-cover lg:block lg:w-2/3 bg-[url('https://images.unsplash.com/photo-1537724326059-2ea20251b9c8?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1776&q=80')]">
+            <div className="hidden bg-cover lg:block lg:w-2/3 bg-[url('https://images.unsplash.com/photo-1606156822967-c44b9271f520?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80')]">
                 <div className="flex items-center h-full px-20 bg-gray-900 bg-opacity-40">
                     <div>
                         <h2 className="text-4xl font-bold text-white">Secure Online Banking</h2>                        
