@@ -60,3 +60,7 @@ SERVER_ADDRESS:3000/login
 
 Sensitive information is securely stored in the database
 <kbd><img src="https://user-images.githubusercontent.com/111074839/204615720-9311a6ad-aee9-485b-83a0-6585a5cde405.png"></kbd>
+
+Personal information can be viewed by account owner...based on reveal policy created on CipherTrust Manager
+<kbd><img src="https://user-images.githubusercontent.com/111074839/204616468-f2998f48-6fd2-4772-a5cd-e348c6549538.png"></kbd>
+
