@@ -22,6 +22,12 @@ Clone this repo on your Windows workstation
 git clone https://github.com/anugram/BankingApp-CM29_DPG11.git
 ```
 #### 3) Install required PowerShell modules 
+Install YQ "YAML Parser" utility based on host OS (example Ubuntu)
+```
+sudo apt install yq -y
+```
+
+
 The helper PowerShell script bundled with this demo requires YAML module which can be installed using the command -
 ```
 Install-Module -Name powershell-yaml -RequiredVersion 0.4.2
