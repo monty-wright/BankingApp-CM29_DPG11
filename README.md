@@ -57,3 +57,6 @@ Login with new account
 SERVER_ADDRESS:3000/login
 ```
 <kbd><img src="https://user-images.githubusercontent.com/111074839/204613093-7350d3b4-1450-426e-944f-b47626c63497.png"></kbd>
+
+Sensitive information is securely stored in the database
+<kbd><img src="https://user-images.githubusercontent.com/111074839/204615720-9311a6ad-aee9-485b-83a0-6585a5cde405.png"></kbd>
