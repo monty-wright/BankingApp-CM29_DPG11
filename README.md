@@ -50,13 +50,10 @@ Register new account
 ```
 SERVER_ADDRESS:3000/userCreate
 ```
-```
-![image](https://user-images.githubusercontent.com/111074839/204612767-7527e353-a5e3-47e0-afce-5444b177c5d1.png)
-```
+<kbd><img src="https://user-images.githubusercontent.com/111074839/204612767-7527e353-a5e3-47e0-afce-5444b177c5d1.png"></kbd>
+
 Login with new account
 ```
 SERVER_ADDRESS:3000/login
 ```
-```
-![image](https://user-images.githubusercontent.com/111074839/204613093-7350d3b4-1450-426e-944f-b47626c63497.png)
-```
+<kbd><img src="https://user-images.githubusercontent.com/111074839/204613093-7350d3b4-1450-426e-944f-b47626c63497.png"></kbd>
