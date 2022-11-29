@@ -44,16 +44,16 @@ We are all set now, run the below command to deploy the docker containers that h
 ```
 Once the script execution completes, open the demo using the URL -
 ```
-localhost:3050
+SERVER_ADDRESS:3000
 ```
-Use below credentials to test demo app
+Register new account 
 ```
-Account Holder
-username - ccaccountowner
-password - KeySecure01!
+SERVER_ADDRESS:3000/userCreate
 ```
+![image](https://user-images.githubusercontent.com/111074839/204612767-7527e353-a5e3-47e0-afce-5444b177c5d1.png)
+
+Login with new account
 ```
-Account Manager (Bank Exec)
-username - cccustomersupport
-password - KeySecure01!
+SERVER_ADDRESS:3000/login
 ```
+![image](https://user-images.githubusercontent.com/111074839/204613093-7350d3b4-1450-426e-944f-b47626c63497.png)
