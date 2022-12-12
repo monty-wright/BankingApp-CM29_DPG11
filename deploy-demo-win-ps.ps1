@@ -35,9 +35,13 @@ $response = Invoke-RestMethod -Method 'Post' -Uri $Url -Body $body
 $jwt = $response.jwt
 
 #Generic header for next set of API calls
-$headers = @{    
+$headers = @{
     Authorization="Bearer $jwt"
 }
+
+$url = "https://$kms/api/v1/auth/self/user"
+$response = Invoke-RestMethod -Method 'Get' -Uri $url -Headers $headers -ContentType 'application/json'
+$userID = $response.user_id
 
 #Create DPG Key
 Write-Output "Creating DPG Key"
@@ -50,7 +54,7 @@ $body = @{
     'unexportable' = $false
     'undeletable' = $false
     'meta' = @{
-        'ownerId' = 'local|312c1485-aa03-454c-8591-6bd41509d846'
+        'ownerId' = $userID
         'versionedKey' = $true
     }
 }
@@ -103,7 +107,7 @@ $body = @{
     'key' = "dpgKey-$counter"
     'tweak' = '1628462495815733'
     'tweak_algorithm' = 'SHA1'
-    'algorithm' = 'FPE/FF3/ASCII'
+    'algorithm' = 'FPE/FF1v2/UNICODE'
     'character_set_id' = $charSetId
 }
 $jsonBody = $body | ConvertTo-Json -Depth 5
@@ -118,33 +122,16 @@ $body = @{
     'key' = "dpgKey-$counter"
     'tweak' = '9828462495846783'
     'tweak_algorithm' = 'SHA1'
-    'algorithm' = 'FPE/AES/CARD10'
+    'algorithm' = 'FPE/FF1v2/CARD10'
     'allow_single_char_input' = $false
-    'character_set_id' = $charSetId
 }
 $jsonBody = $body | ConvertTo-Json -Depth 5
 $response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
 $ccPolicyId = $response.id
 
-#Creating SSN Protection Policy
-#Write-Output "Creating Protection Policy for SSN..."
-#$url = "https://$kms/api/v1/data-protection/protection-policies"
-#$body = @{
-#    'name' = "SSN_ProtectionPolicy-$counter"
-#    'key' = "dpgKey-$counter"
-#    'tweak' = '1628462495815733'
-#    'tweak_algorithm' = 'SHA1'
-#    'algorithm' = 'FPE/FF1v2/UNICODE'
-#    'character_set_id' = $charSetId
-#    'allow_single_char_input' = $false
-#}
-#$jsonBody = $body | ConvertTo-Json -Depth 5
-#$response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
-#$ssnPolicyId = $response.id
-
 Write-Output "Creating sample users..."
 #ccaccountowner, cccustomersupport, everyoneelse --- password is same for all...KeySecure01!
-$users = "ccaccountowner","cccustomersupport","everyoneelse","user1","user2","user3"
+$users = "cccustomersupport"
 foreach ($user in $users)
 {
     $url = "https://$kms/api/v1/usermgmt/users"
@@ -166,7 +153,7 @@ $url = "https://$kms/api/v1/data-protection/user-sets"
 $body = @{
     'name' = "plainttextuserset-$counter"
     'description' = "plain text user set for card account owner"
-    'users' = @('ccaccountowner', 'user1', 'user2', 'user3')
+    'users' = @()
 }
 $jsonBody = $body | ConvertTo-Json -Depth 5
 $response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
@@ -188,7 +175,7 @@ $url = "https://$kms/api/v1/data-protection/user-sets"
 $body = @{
     'name' = "enctextuserset-$counter"
     'description' = "encrypted text user set for everyone else"
-    'users' = @('everyoneelse')
+    'users' = @()
 }
 $jsonBody = $body | ConvertTo-Json -Depth 5
 $response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
@@ -314,18 +301,40 @@ $body = @{
             )
         },
         @{
-            'api_url' = '/api/fakebank/details/{id}'
+            'api_url' = '/api/fakebank/account/personal/{id}'
             'json_response_get_tokens' = @(
                 @{
                     'name' = 'details.ssn'
                     'operation' = 'reveal'
-                    'protection_policy' = "CC_ProtectionPolicy-$counter"
+                    'protection_policy' = "text_ProtectionPolicy-$counter"
                     'access_policy' = "last_four_show_access_policy-$counter"
                 },@{
                     'name' = 'details.dob'
                     'operation' = 'reveal'
-                    'protection_policy' = "CC_ProtectionPolicy-$counter"
+                    'protection_policy' = "text_ProtectionPolicy-$counter"
                     'access_policy' = "last_four_show_access_policy-$counter"
+                }
+            )
+        },
+        @{
+            'api_url' = '/api/user-mgmt/user/create'
+            'json_request_post_tokens' = @(
+                @{
+                    'name' = 'personal.ssn'
+                    'operation' = 'protect'
+                    'protection_policy' = "text_ProtectionPolicy-$counter"
+                },@{
+                    'name' = 'personal.dob'
+                    'operation' = 'protect'
+                    'protection_policy' = "text_ProtectionPolicy-$counter"
+                },@{
+                    'name' = 'card.ccNumber'
+                    'operation' = 'protect'
+                    'protection_policy' = "CC_ProtectionPolicy-$counter"
+                },@{
+                    'name' = 'card.cvv'
+                    'operation' = 'protect'
+                    'protection_policy' = "text_ProtectionPolicy-$counter"
                 }
             )
         }
@@ -385,10 +394,13 @@ $yamlObj.services.ciphertrust.environment = @(
     "DPG_PORT=9005"
 )
 $yamlObj.services.api.environment = @(
-    "CMIP=https://$kms"
+    "CMIP=https://$kms",
+    "CM_USERNAME=$username",
+    "CM_PASSWORD=$password",
+    "CM_USER_SET_ID=$plainTextUserSetId"
 )
 
-$yaml = ConvertTo-YAML $yamlObj | .\yq.exe
+$yaml = ConvertTo-YAML $yamlObj | yq
 Set-Content -Path ".\docker-compose.yml" -Value $yaml
 
 Write-Output "`n"
@@ -401,4 +413,4 @@ Write-Output "| CMIP: https://=$kms"
 Write-Output "|__________________________________________________________________________|"
 
 Write-Output "Running demo application now..."
-docker compose up
+sudo docker compose up
