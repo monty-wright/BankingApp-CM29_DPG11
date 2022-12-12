@@ -21,7 +21,7 @@ $response = Invoke-RestMethod -SkipCertificateCheck -Method 'Post' -Uri $Url -Bo
 $jwt = $response.jwt
 
 #Generic header for next set of API calls
-$headers = @{    
+$headers = @{
     Authorization="Bearer $jwt"
 }
 
@@ -117,7 +117,7 @@ $ccPolicyId = $response.id
 
 Write-Output "Creating sample users..."
 #ccaccountowner, cccustomersupport, everyoneelse --- password is same for all...KeySecure01!
-$users = "ccaccountowner","cccustomersupport","everyoneelse","user1","user2","user3"
+$users = "cccustomersupport"
 foreach ($user in $users)
 {
     $url = "https://$kms/api/v1/usermgmt/users"
@@ -139,7 +139,7 @@ $url = "https://$kms/api/v1/data-protection/user-sets"
 $body = @{
     'name' = "plainttextuserset-$counter"
     'description' = "plain text user set for card account owner"
-    'users' = @('ccaccountowner', 'user1', 'user2', 'user3')
+    'users' = @()
 }
 $jsonBody = $body | ConvertTo-Json -Depth 5
 $response = Invoke-RestMethod -SkipCertificateCheck -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
@@ -161,7 +161,7 @@ $url = "https://$kms/api/v1/data-protection/user-sets"
 $body = @{
     'name' = "enctextuserset-$counter"
     'description' = "encrypted text user set for everyone else"
-    'users' = @('everyoneelse')
+    'users' = @()
 }
 $jsonBody = $body | ConvertTo-Json -Depth 5
 $response = Invoke-RestMethod -SkipCertificateCheck -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
@@ -381,9 +381,9 @@ $yamlObj.services.ciphertrust.environment = @(
 )
 $yamlObj.services.api.environment = @(
     "CMIP=https://$kms",
-	"CM_USERNAME=$username",
-	"CM_PASSWORD=$password",
-	"CM_USER_SET_ID=$plainTextUserSetId"
+    "CM_USERNAME=$username",
+    "CM_PASSWORD=$password",
+    "CM_USER_SET_ID=$plainTextUserSetId"
 )
 
 $yaml = ConvertTo-YAML $yamlObj | yq
