@@ -34,7 +34,12 @@ Install-Module -Name powershell-yaml -RequiredVersion 0.4.2
 ```
 ***You might require to add -Scope {CurrentUser} if not running as an administrator***
 The PowerShell script at the root of this repo is a helper script that can get you started without understanding Ciphertrust Manager or any other internal details that may be overwhelming initially.
-#### 4) Configure PowerShell script
+#### 4) Update UI .env file
+update the .env file in ui folder with the IP address of the server where you want to deploy this docker based application
+```
+REACT_APP_BACKEND_IP_ADDRESS=1.2.3.4
+```
+#### 5) Configure PowerShell script
 Once you have the CM installed and repo cloned, the only thing you need to change are some of the variables in the bundled ps1 file i.e. 'deploy-demo-win-ps.ps1'
 Updated below variables at the top of the file
 ```
@@ -43,7 +48,7 @@ $password = "<CM Password>"
 $kms = "<CM Hostname/IP>"
 $counter = "suffix"
 ```
-#### 5) Deploying and running demo
+#### 6) Deploying and running demo
 We are all set now, run the below command to deploy the docker containers that holds the demo application
 ```
 .\deploy-demo-win-ps.ps1
