@@ -59,7 +59,22 @@ $body = @{
     }
 }
 $jsonBody = $body | ConvertTo-Json -Depth 5
-$response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+try {
+    $response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'    
+}
+catch {
+    $StatusCode = $_.Exception.Response.StatusCode
+    if ($StatusCode -EQ [System.Net.HttpStatusCode]::Conflict) {
+        Write-Error "Error $([int]$StatusCode) $($StatusCode): Key already exists"
+    }
+    elseif ($StatusCode -EQ [System.Net.HttpStatusCode]::Unauthorized) {
+        Write-Error "Error $([int]$StatusCode) $($StatusCode): Unable to connect to CipherTrust Manager with current credentials"
+    }
+    else {
+        Write-Error "Error $([int]$StatusCode) $($StatusCode): $($_.Exception.Response.ReasonPhrase)" -ErrorAction Stop
+    }
+}
+
 $keyID = $response.id
 
 #Fetching local root CA ID
@@ -84,7 +99,23 @@ $body = @{
     'network_interface' = 'all'
 }
 $jsonBody = $body | ConvertTo-Json -Depth 5
-$response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+try {
+    $response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+    Write-Debug "Response: $($response)" 
+}
+catch {
+    $StatusCode = $_.Exception.Response.StatusCode
+    if ($StatusCode -EQ [System.Net.HttpStatusCode]::Conflict) {
+        Write-Error "Error $([int]$StatusCode) $($StatusCode): Interface already exists"
+    }
+    elseif ($StatusCode -EQ [System.Net.HttpStatusCode]::Unauthorized) {
+        Write-Error "Error $([int]$StatusCode) $($StatusCode): Unable to connect to CipherTrust Manager with current credentials"
+    }
+    else {
+        Write-Error "Error $([int]$StatusCode) $($StatusCode): $($_.Exception.Response.ReasonPhrase)" -ErrorAction Stop
+    }
+}
+
 
 #Creating Character Set
 Write-Output "Creating Character Set..."
@@ -96,7 +127,21 @@ $body = @{
     'encoding' = 'UTF-8'
 }
 $jsonBody = $body | ConvertTo-Json -Depth 5
-$response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+try {
+    $response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+}
+catch {
+    $StatusCode = $_.Exception.Response.StatusCode
+    if ($StatusCode -EQ [System.Net.HttpStatusCode]::Conflict) {
+        Write-Error "Error $([int]$StatusCode) $($StatusCode): Charset already exists"
+    }
+    elseif ($StatusCode -EQ [System.Net.HttpStatusCode]::Unauthorized) {
+        Write-Error "Error $([int]$StatusCode) $($StatusCode): Unable to connect to CipherTrust Manager with current credentials"
+    }
+    else {
+        Write-Error "Error $([int]$StatusCode) $($StatusCode): $($_.Exception.Response.ReasonPhrase)" -ErrorAction Stop
+    }
+}
 $charSetId = $response.id
 
 #Creating CVV Protection Policy
@@ -111,7 +156,21 @@ $body = @{
     'character_set_id' = $charSetId
 }
 $jsonBody = $body | ConvertTo-Json -Depth 5
-$response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+try {
+    $response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+}
+catch {
+    $StatusCode = $_.Exception.Response.StatusCode
+    if ($StatusCode -EQ [System.Net.HttpStatusCode]::Conflict) {
+        Write-Error "Error $([int]$StatusCode) $($StatusCode): Protection Policy already exists"
+    }
+    elseif ($StatusCode -EQ [System.Net.HttpStatusCode]::Unauthorized) {
+        Write-Error "Error $([int]$StatusCode) $($StatusCode): Unable to connect to CipherTrust Manager with current credentials"
+    }
+    else {
+        Write-Error "Error $([int]$StatusCode) $($StatusCode): $($_.Exception.Response.ReasonPhrase)" -ErrorAction Stop
+    }
+}
 $textPolicyId = $response.id
 
 #Creating CC Number Protection Policy
@@ -126,7 +185,21 @@ $body = @{
     'allow_single_char_input' = $false
 }
 $jsonBody = $body | ConvertTo-Json -Depth 5
-$response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+try {
+    $response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+}
+catch {
+    $StatusCode = $_.Exception.Response.StatusCode
+    if ($StatusCode -EQ [System.Net.HttpStatusCode]::Conflict) {
+        Write-Error "Error $([int]$StatusCode) $($StatusCode): Protection Policy already exists"
+    }
+    elseif ($StatusCode -EQ [System.Net.HttpStatusCode]::Unauthorized) {
+        Write-Error "Error $([int]$StatusCode) $($StatusCode): Unable to connect to CipherTrust Manager with current credentials"
+    }
+    else {
+        Write-Error "Error $([int]$StatusCode) $($StatusCode): $($_.Exception.Response.ReasonPhrase)" -ErrorAction Stop
+    }
+}
 $ccPolicyId = $response.id
 
 Write-Output "Creating sample users..."
@@ -144,7 +217,21 @@ foreach ($user in $users)
         'user_metadata' = @{}
     }
     $jsonBody = $body | ConvertTo-Json -Depth 5
-    Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+    try {
+        Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+    }
+    catch {
+        $StatusCode = $_.Exception.Response.StatusCode
+        if ($StatusCode -EQ [System.Net.HttpStatusCode]::Conflict) {
+            Write-Error "Error $([int]$StatusCode) $($StatusCode): User already exists"
+        }
+        elseif ($StatusCode -EQ [System.Net.HttpStatusCode]::Unauthorized) {
+            Write-Error "Error $([int]$StatusCode) $($StatusCode): Unable to connect to CipherTrust Manager with current credentials"
+        }
+        else {
+            Write-Error "Error $([int]$StatusCode) $($StatusCode): $($_.Exception.Response.ReasonPhrase)" -ErrorAction Stop
+        }
+    }
 }
 
 #Creating User Sets
@@ -156,7 +243,21 @@ $body = @{
     'users' = @()
 }
 $jsonBody = $body | ConvertTo-Json -Depth 5
-$response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+try {
+    $response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+}
+catch {
+    $StatusCode = $_.Exception.Response.StatusCode
+    if ($StatusCode -EQ [System.Net.HttpStatusCode]::Conflict) {
+        Write-Error "Error $([int]$StatusCode) $($StatusCode): Userset already exists"
+    }
+    elseif ($StatusCode -EQ [System.Net.HttpStatusCode]::Unauthorized) {
+        Write-Error "Error $([int]$StatusCode) $($StatusCode): Unable to connect to CipherTrust Manager with current credentials"
+    }
+    else {
+        Write-Error "Error $([int]$StatusCode) $($StatusCode): $($_.Exception.Response.ReasonPhrase)" -ErrorAction Stop
+    }
+}
 $plainTextUserSetId = $response.id
 
 Write-Output "Creating Masked Data User Set..."
@@ -167,7 +268,21 @@ $body = @{
     'users' = @('cccustomersupport')
 }
 $jsonBody = $body | ConvertTo-Json -Depth 5
-$response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+try {
+    $response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+}
+catch {
+    $StatusCode = $_.Exception.Response.StatusCode
+    if ($StatusCode -EQ [System.Net.HttpStatusCode]::Conflict) {
+        Write-Error "Error $([int]$StatusCode) $($StatusCode): Userset already exists"
+    }
+    elseif ($StatusCode -EQ [System.Net.HttpStatusCode]::Unauthorized) {
+        Write-Error "Error $([int]$StatusCode) $($StatusCode): Unable to connect to CipherTrust Manager with current credentials"
+    }
+    else {
+        Write-Error "Error $([int]$StatusCode) $($StatusCode): $($_.Exception.Response.ReasonPhrase)" -ErrorAction Stop
+    }
+}
 $maskedTextUserSetId = $response.id
 
 Write-Output "Creating Encrypted Data User Set..."
@@ -178,7 +293,21 @@ $body = @{
     'users' = @()
 }
 $jsonBody = $body | ConvertTo-Json -Depth 5
-$response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+try {
+    $response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+}
+catch {
+    $StatusCode = $_.Exception.Response.StatusCode
+    if ($StatusCode -EQ [System.Net.HttpStatusCode]::Conflict) {
+        Write-Error "Error $([int]$StatusCode) $($StatusCode): Userset already exists"
+    }
+    elseif ($StatusCode -EQ [System.Net.HttpStatusCode]::Unauthorized) {
+        Write-Error "Error $([int]$StatusCode) $($StatusCode): Unable to connect to CipherTrust Manager with current credentials"
+    }
+    else {
+        Write-Error "Error $([int]$StatusCode) $($StatusCode): $($_.Exception.Response.ReasonPhrase)" -ErrorAction Stop
+    }
+}
 $encTextUserSetId = $response.id
 
 #Creating masking policy
@@ -192,7 +321,21 @@ $body = @{
     'mask_char' = 'x'
 }
 $jsonBody = $body | ConvertTo-Json -Depth 5
-$response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+try {
+    $response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+}
+catch {
+    $StatusCode = $_.Exception.Response.StatusCode
+    if ($StatusCode -EQ [System.Net.HttpStatusCode]::Conflict) {
+        Write-Error "Error $([int]$StatusCode) $($StatusCode): Masking Format already exists"
+    }
+    elseif ($StatusCode -EQ [System.Net.HttpStatusCode]::Unauthorized) {
+        Write-Error "Error $([int]$StatusCode) $($StatusCode): Unable to connect to CipherTrust Manager with current credentials"
+    }
+    else {
+        Write-Error "Error $([int]$StatusCode) $($StatusCode): $($_.Exception.Response.ReasonPhrase)" -ErrorAction Stop
+    }
+}
 $maskingPolicyId = $response.id
 
 #Creating Access Policies
@@ -219,7 +362,21 @@ $body = @{
     )
 }
 $jsonBody = $body | ConvertTo-Json -Depth 5
-$response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+try {
+    $response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+}
+catch {
+    $StatusCode = $_.Exception.Response.StatusCode
+    if ($StatusCode -EQ [System.Net.HttpStatusCode]::Conflict) {
+        Write-Error "Error $([int]$StatusCode) $($StatusCode): Access Policy already exists"
+    }
+    elseif ($StatusCode -EQ [System.Net.HttpStatusCode]::Unauthorized) {
+        Write-Error "Error $([int]$StatusCode) $($StatusCode): Unable to connect to CipherTrust Manager with current credentials"
+    }
+    else {
+        Write-Error "Error $([int]$StatusCode) $($StatusCode): $($_.Exception.Response.ReasonPhrase)" -ErrorAction Stop
+    }
+}
 $accessPolicyId = $response.id
 
 #Creating Access Policies
@@ -245,7 +402,21 @@ $body = @{
     )
 }
 $jsonBody = $body | ConvertTo-Json -Depth 5
-$response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+try {
+    $response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+}
+catch {
+    $StatusCode = $_.Exception.Response.StatusCode
+    if ($StatusCode -EQ [System.Net.HttpStatusCode]::Conflict) {
+        Write-Error "Error $([int]$StatusCode) $($StatusCode): Access Policy already exists"
+    }
+    elseif ($StatusCode -EQ [System.Net.HttpStatusCode]::Unauthorized) {
+        Write-Error "Error $([int]$StatusCode) $($StatusCode): Unable to connect to CipherTrust Manager with current credentials"
+    }
+    else {
+        Write-Error "Error $([int]$StatusCode) $($StatusCode): $($_.Exception.Response.ReasonPhrase)" -ErrorAction Stop
+    }
+}
 $accessPolicyId = $response.id
 
 #This is the interesting step...defining DPG policies for the API endpoints
@@ -341,7 +512,21 @@ $body = @{
     )
 }
 $jsonBody = $body | ConvertTo-Json -Depth 5
-$response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+try {
+    $response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+}
+catch {
+    $StatusCode = $_.Exception.Response.StatusCode
+    if ($StatusCode -EQ [System.Net.HttpStatusCode]::Conflict) {
+        Write-Error "Error $([int]$StatusCode) $($StatusCode): DPG Policy already exists"
+    }
+    elseif ($StatusCode -EQ [System.Net.HttpStatusCode]::Unauthorized) {
+        Write-Error "Error $([int]$StatusCode) $($StatusCode): Unable to connect to CipherTrust Manager with current credentials"
+    }
+    else {
+        Write-Error "Error $([int]$StatusCode) $($StatusCode): $($_.Exception.Response.ReasonPhrase)" -ErrorAction Stop
+    }
+}
 $dpgPolicyId = $response.id
 
 #Final setup...creating client application
@@ -379,7 +564,21 @@ $body = @{
     }
 }
 $jsonBody = $body | ConvertTo-Json -Depth 5
-$response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+try {
+    $response = Invoke-RestMethod -Method 'Post' -Uri $url -Body $jsonBody -Headers $headers -ContentType 'application/json'
+}
+catch {
+    $StatusCode = $_.Exception.Response.StatusCode
+    if ($StatusCode -EQ [System.Net.HttpStatusCode]::Conflict) {
+        Write-Error "Error $([int]$StatusCode) $($StatusCode): Client Profile already exists"
+    }
+    elseif ($StatusCode -EQ [System.Net.HttpStatusCode]::Unauthorized) {
+        Write-Error "Error $([int]$StatusCode) $($StatusCode): Unable to connect to CipherTrust Manager with current credentials"
+    }
+    else {
+        Write-Error "Error $([int]$StatusCode) $($StatusCode): $($_.Exception.Response.ReasonPhrase)" -ErrorAction Stop
+    }
+}
 $regToken = $response.reg_token
 
 [string[]]$fileContent = Get-Content ".\docker-compose-template.yml"
