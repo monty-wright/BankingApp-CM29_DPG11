@@ -2,7 +2,7 @@
 This sample is a turnkey docker based multi-tier application that demonstrates data protection with Thales Ciphertrust Manager Community Edition. Securing credit card information as well as user's personal information like SSN is not only a value add, but a compliance mandated requirement.
 This project will let you
 * Deploy a fully functional app including ReactJs based frontend, SpringBoot based REST API backend, and MongoDB based data persistence all within a single docker deployment
-* Using a PowerShell script to automate all the configurations needed on Thales CipherTrust Manager to rub this demo
+* Using a PowerShell script to automate all the configurations needed on Thales CipherTrust Manager to run this demo
 
 ## Getting Started
 ### Prerequisites
